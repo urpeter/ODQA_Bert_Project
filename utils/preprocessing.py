@@ -54,6 +54,7 @@ def process_quasar(folder, set_type, doc_size):
         for line in qf:
             parsed_question = json.loads(line)
             question = parsed_question["question"]
+            # print(question)
             question_id = parsed_question["uid"]
             # question_answer = parsed_question["answer"]
             question_dic[question_id] = [question]
@@ -64,9 +65,11 @@ def process_quasar(folder, set_type, doc_size):
             answer_id = parsed_answer["uid"]
             # List of contexts with retrieval scores, contexts are sorted from highest to lowest score
             answer_contexts = parsed_answer["contexts"]
-            question_dic[answer_id].append(answer_contexts)
+            question_dic[answer_id].append(answer_contexts[1])
 
-        print(question_dic)
+        # for key, value in question_dic:
+        #    print("key: " + key)
+        #    print("value: " + value)
         tokens_list = [tokenizer.encode(value[0], value[1]) for key, value in question_dic]
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
