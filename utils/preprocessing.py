@@ -65,7 +65,10 @@ def process_quasar(folder, set_type, doc_size):
             answer_id = parsed_answer["uid"]
             # List of contexts with retrieval scores, contexts are sorted from highest to lowest score
             answer_contexts = parsed_answer["contexts"]
-            question_dic[answer_id].append(answer_contexts[1])
+            # remove scores of contexts
+            cleaned_answer_contexts = [ls_elem[1] for ls_elem in answer_contexts]
+            print(cleaned_answer_contexts)
+            question_dic[answer_id].append(cleaned_answer_contexts)
 
         # for key, value in question_dic:
         #    print("key: " + key)
