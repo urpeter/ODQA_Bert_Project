@@ -66,6 +66,7 @@ def process_quasar(folder, set_type, doc_size):
             answer_contexts = parsed_answer["contexts"]
             question_dic[answer_id].append(answer_contexts)
 
+        print(question_dic)
         tokens_list = [tokenizer.encode(value[0], value[1]) for key, value in question_dic]
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
