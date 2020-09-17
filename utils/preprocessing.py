@@ -71,10 +71,10 @@ def process_quasar(folder, set_type, doc_size):
             one_string_contexts = ' '.join(cleaned_answer_contexts)
             question_dic[answer_id].append(one_string_contexts)
 
-        # for key, value in question_dic:
+        # for key, value in question_dic.items():
         #    print("key: " + key)
         #    print("value: " + value)
-        tokens_list = [tokenizer.encode(value[0], value[1]) for key, value in question_dic]
+        tokens_list = [tokenizer.encode(value[0], value[1]) for key, value in question_dic.items()]
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
         # nested list
