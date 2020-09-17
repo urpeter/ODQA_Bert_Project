@@ -67,8 +67,9 @@ def process_quasar(folder, set_type, doc_size):
             answer_contexts = parsed_answer["contexts"]
             # remove scores of contexts
             cleaned_answer_contexts = [ls_elem[1] for ls_elem in answer_contexts]
-            print(cleaned_answer_contexts)
-            question_dic[answer_id].append(cleaned_answer_contexts)
+            # join all contexts to one single string
+            one_string_contexts = ' '.join(cleaned_answer_contexts)
+            question_dic[answer_id].append(one_string_contexts)
 
         # for key, value in question_dic:
         #    print("key: " + key)
