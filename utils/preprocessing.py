@@ -24,7 +24,7 @@ def process_searchqa(folder, set_type):
             # question_dic[json_data["id"]] = {"question":json_data["question"], "answer":json_data["answer"],
             # "contexts":[c["snippet"] for c in json_data["search_results"] if c["snippet"] is not None]}
             tokens_list = [tokenizer.encode_plus(json_data["question"], c["snippet"], padding=True, truncation=True,
-                                                 return_tensors="pt")
+                                                 max_length=512, return_tensors="pt")
                            for c in json_data["search_results"] if c["snippet"] is not None]
             # TODO: FOR REINFORCEMENT LEARNING ANSWERS NEEDED?!
             # question_dic_answer =
@@ -77,7 +77,7 @@ def process_quasar(folder, set_type, doc_size):
         #    print("key: " + key)
         #    print("value: " + value)
 
-        tokens_list = [tokenizer.encode(value[0], con, max_length=512) for key, value in question_dic.items()
+        tokens_list = [tokenizer.encode(value[0], con) for key, value in question_dic.items()
                        for con in value[1]]
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
