@@ -1,4 +1,4 @@
-from transformers import BertForQuestionAnswering, AutoTokenizer
+from transformers import AutoModelForQuestionAnswering, AutoTokenizer
 import torch
 import os
 # Command line interaction
@@ -11,7 +11,7 @@ import pickle
 from pathlib import Path
 
 tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
-model = BertForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad', return_dict=True)
+model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad', return_dict=True)
 
 
 def process_searchqa(folder, set_type):
