@@ -23,7 +23,8 @@ def process_searchqa(folder, set_type):
             json_data = json.loads(f.read().replace(r" \n", " "))
             # question_dic[json_data["id"]] = {"question":json_data["question"], "answer":json_data["answer"],
             # "contexts":[c["snippet"] for c in json_data["search_results"] if c["snippet"] is not None]}
-            tokens_list = [tokenizer.encode_plus(json_data["question"], c["snippet"], padding=True, return_tensors="pt")
+            tokens_list = [tokenizer.encode_plus(json_data["question"], c["snippet"], padding=True, truncation=True,
+                                                 return_tensors="pt")
                            for c in json_data["search_results"] if c["snippet"] is not None]
             # TODO: FOR REINFORCEMENT LEARNING ANSWERS NEEDED?!
             # question_dic_answer =
