@@ -10,8 +10,8 @@ import pickle
 # Handle the file paths
 from pathlib import Path
 
-tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
-model = BertForQuestionAnswering.from_pretrained('bert-base-uncased', return_dict=True)
+tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
+model = BertForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad', return_dict=True)
 
 
 def process_searchqa(folder, set_type):
