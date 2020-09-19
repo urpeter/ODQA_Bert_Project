@@ -11,14 +11,15 @@ import pickle
 from pathlib import Path
 
 tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
-model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad', return_dict=True)
+model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
+                                                      return_dict=True)
 
 
 def process_searchqa(folder, set_type):
     # question_dic = {}
     file_path = Path("/".join([folder, 'train_val_test_json_split', 'data_json', set_type]))
     for filename in os.listdir(file_path):
-        with open(os.path.join(file_path,filename), "r") as f:
+        with open(os.path.join(file_path, filename), "r") as f:
             json_data = json.loads(f.read().replace(r" \n", " "))
             # question_dic[json_data["id"]] = {"question":json_data["question"], "answer":json_data["answer"],
             # "contexts":[c["snippet"] for c in json_data["search_results"] if c["snippet"] is not None]}
@@ -67,14 +68,16 @@ def process_quasar(folder, set_type, doc_size):
             answer_contexts = parsed_answer["contexts"]
             # remove scores of contexts
             cleaned_answer_contexts = [ls_elem[1] for ls_elem in answer_contexts]
-            # join all contexts to one single string
-            one_string_contexts = ' '.join(cleaned_answer_contexts)
-            question_dic[answer_id].append(one_string_contexts)
+            # join all contexts to one single string => creates too long tokens for model
+            # one_string_contexts = ' '.join(cleaned_answer_contexts)
+            question_dic[answer_id].append(cleaned_answer_contexts)
 
         # for key, value in question_dic.items():
         #    print("key: " + key)
         #    print("value: " + value)
-        tokens_list = [tokenizer.encode(value[0], value[1]) for key, value in question_dic.items()]
+
+        tokens_list = [tokenizer.encode(value[0], con, max_length=512) for key, value in question_dic.items()
+                       for con in value[1]]
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
         # nested list
