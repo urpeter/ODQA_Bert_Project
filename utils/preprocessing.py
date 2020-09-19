@@ -1,4 +1,4 @@
-from transformers import BertTokenizer, BertForQuestionAnswering
+from transformers import BertForQuestionAnswering, PreTrainedTokenizer
 import torch
 import os
 # Command line interaction
@@ -10,7 +10,7 @@ import pickle
 # Handle the file paths
 from pathlib import Path
 
-tokenizer = BertTokenizer.from_pretrained('bert-large-uncased')
+tokenizer = PreTrainedTokenizer.from_pretrained('bert-large-uncased')
 model = BertForQuestionAnswering.from_pretrained('bert-large-uncased', return_dict=True)
 
 
