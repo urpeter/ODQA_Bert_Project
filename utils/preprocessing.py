@@ -24,7 +24,7 @@ def process_searchqa(folder, set_type):
             # question_dic[json_data["id"]] = {"question":json_data["question"], "answer":json_data["answer"],
             # "contexts":[c["snippet"] for c in json_data["search_results"] if c["snippet"] is not None]}
             tokens_list = [tokenizer.encode_plus(json_data["question"], c["snippet"], max_length=512,
-                                                 pad_to_max_length=True, truncation=True, return_tensors="pt")
+                                                 padding=True, truncation=True, return_tensors="pt")
                            for c in json_data["search_results"] if c["snippet"] is not None]
             # TODO: FOR REINFORCEMENT LEARNING ANSWERS NEEDED?!
             # question_dic_answer =
