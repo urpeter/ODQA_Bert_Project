@@ -77,7 +77,7 @@ def process_quasar(folder, set_type, doc_size):
         #    print("key: " + key)
         #    print("value: " + value)
 
-        tokens_list = [tokenizer.encode(value[0], con) for key, value in question_dic.items()
+        tokens_list = [tokenizer.encode(value[0], con, max_length=512) for key, value in question_dic.items()
                        for con in value[1]]
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
