@@ -5,7 +5,10 @@ from transformers import AdamW
 import utils.preprocessing
 import os
 import torch
+import pickle
 
+def load_pickled_glove(GLOVE_PATH):
+    return pickle.load(open(f'../outputs/glove_dict.pkl', 'rb'))
 
 def main(train_encodings,val_encodings):
     model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
@@ -39,4 +42,8 @@ def main(train_encodings,val_encodings):
 
 
 if __name__ == '__main__':
+
+    infile = open(filename, 'rb')
+    new_dict = pickle.load(infile)
+    infile.close()
     main()
