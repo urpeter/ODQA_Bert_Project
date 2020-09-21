@@ -15,20 +15,37 @@ model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-
                                                       return_dict=True)
 
 
-def process_searchqa(folder, set_type):
+def add_end_idx(answers, contexts):
+    for answer, context in zip(answers, contexts):
+        gold_text = answer['text']
+        start_idx = answer['answer_start']
+        end_idx = start_idx + len(gold_text)
+
+        # sometimes squad answers are off by a character or two – fix this
+        if context[start_idx:end_idx] == gold_text:
+            answer['answer_end'] = end_idx
+        elif context[start_idx-1:end_idx-1] == gold_text:
+            answer['answer_start'] = start_idx - 1
+            answer['answer_end'] = end_idx - 1     # When the gold label is off by one character
+        elif context[start_idx-2:end_idx-2] == gold_text:
+            answer['answer_start'] = start_idx - 2
+            answer['answer_end'] = end_idx - 2     # When the gold label is off by two characters
+
+
+def process_searchqa(folder, set_type): # TODO: check if data is properly processed !!
+    answer_dic = dict()
     # question_dic = {}
     file_path = Path("/".join([folder, 'train_val_test_json_split', 'data_json', set_type]))
     for filename in os.listdir(file_path):
         with open(os.path.join(file_path, filename), "r") as f:
             json_data = json.loads(f.read().replace(r" \n", " "))
-            # question_dic[json_data["id"]] = {"question":json_data["question"], "answer":json_data["answer"],
-            # "contexts":[c["snippet"] for c in json_data["search_results"] if c["snippet"] is not None]}
+            answer_dic[json_data["id"]] = {json_data["answer"]}
             tokens_list = [tokenizer.encode_plus(json_data["question"], c["snippet"], max_length=512,
                                                  padding=True, truncation=True, return_tensors="pt")
                            for c in json_data["search_results"] if c["snippet"] is not None]
-            # TODO: FOR REINFORCEMENT LEARNING ANSWERS NEEDED?!
-            # question_dic_answer =
-    return tokens_list
+            # TODO: FOR REINFORCEMENT LEARNING!
+            # answer_dic =
+    return tokens_list, answer_dic
 
 
 def process_quasar(folder, set_type, doc_size):
@@ -52,13 +69,15 @@ def process_quasar(folder, set_type, doc_size):
         # Parse each line separate to avoid memory issues
 
         question_dic = dict()
+        answer_to_question = list()
+        contexts_to_answer = list()
 
         for line in qf:
             parsed_question = json.loads(line)
             question = parsed_question["question"]
             # print(question)
             question_id = parsed_question["uid"]
-            # question_answer = parsed_question["answer"]
+            answer_to_question.append(parsed_question["answer"])
             question_dic[question_id] = [question]
 
         for line in cf:
@@ -69,6 +88,7 @@ def process_quasar(folder, set_type, doc_size):
             answer_contexts = parsed_answer["contexts"]
             # remove scores of contexts
             cleaned_answer_contexts = [ls_elem[1] for ls_elem in answer_contexts]
+            contexts_to_answer.append(cleaned_answer_contexts)
             # join all contexts to one single string => creates too long tokens for model
             # one_string_contexts = ' '.join(cleaned_answer_contexts)
             question_dic[answer_id].append(cleaned_answer_contexts)
@@ -77,7 +97,10 @@ def process_quasar(folder, set_type, doc_size):
         #    print("key: " + key)
         #    print("value: " + value)
 
-        tokens_list = [tokenizer.encode(value[0], con, max_length=512, pad_to_max_length=True, truncation=True,
+        # get character position at which the answer ends in the passage
+        add_end_idx(answer_to_question, contexts_to_answer)
+
+        tokens_list = [tokenizer.encode(value[0], con, max_length=512, padding=True, truncation=True,
                                         return_tensors="pt") for key, value in question_dic.items()
                        for con in value[1]]
 
