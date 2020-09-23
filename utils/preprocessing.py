@@ -131,7 +131,7 @@ def process_quasar(folder, set_type, doc_size):
             question_id = parsed_question["uid"]
             # answer_to_question.append({"text": parsed_question["answer"]})
             answer_context_dict[question_id] = [parsed_question["answer"]]
-            question_dic[question_id] = [question]
+            question_dic[question_id] = question
 
         for line in cf:
             parsed_answer = json.loads(line)
