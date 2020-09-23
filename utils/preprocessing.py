@@ -27,10 +27,12 @@ def add_end_idx(answ_cont_dict):
         answer = value[0]
         context = value[1]
 
-        gold_text = answer['text']
+        # gold_text = answer['text']
 
         for c in context:
-            index = [(m.start(0), m.end(0)) for m in re.finditer(gold_text, c)]
+            print(c)
+
+            index = [(m.start(0), m.end(0)) for m in re.finditer(answer, c)]
 
             print(index)
 
@@ -113,7 +115,7 @@ def process_quasar(folder, set_type, doc_size):
             # print(question)
             question_id = parsed_question["uid"]
             # answer_to_question.append({"text": parsed_question["answer"]})
-            answer_context_dict[question_id] = [{"text": parsed_question["answer"]}]
+            answer_context_dict[question_id] = [parsed_question["answer"]]
             question_dic[question_id] = [question]
 
         for line in cf:
