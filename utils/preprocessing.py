@@ -162,7 +162,7 @@ def process_quasar(folder, set_type, doc_size):
 
         # print("Question dic of type <quasar> and set type <{}> has {} entries.".format(set_type, len(question_dic)))
         # return question_dic
-        # return tokens_list
+        return encodings
 
 
 def save_to_file(path, question_dic, type, set_type, doc_size=None):
