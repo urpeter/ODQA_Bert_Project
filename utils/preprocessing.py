@@ -69,6 +69,8 @@ def add_token_positions(encodings, answers):
             end_positions[-1] = tokenizer.model_max_length
     encodings.update({'start_positions': start_positions, 'end_positions': end_positions})
 
+    return encodings
+
 
 def create_encodings(question_id_list, context_list, question_dic):
     questions_list = list()
@@ -157,7 +159,7 @@ def process_quasar(folder, set_type, doc_size):
 
         encodings = create_encodings(question_id_list, context_list, question_dic)
 
-        add_token_positions(encodings, answer_list)
+        encodings2 = add_token_positions(encodings, answer_list)
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
         # nested list
