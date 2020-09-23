@@ -32,6 +32,8 @@ def add_end_idx(answ_cont_dict):
         for c in context:
             index = [(m.start(0), m.end(0)) for m in re.finditer(gold_text, c)]
 
+            print(index)
+
             start_idx = index[0][0]
             end_idx = index[0][1]
 
