@@ -30,11 +30,11 @@ def add_end_idx(answ_cont_dict):
         # gold_text = answer['text']
 
         for c in context:
-            print(c, answer)
+            # print('c: ', c, 'answer: ', answer)
 
-            index = [(m.start(0), m.end(0)) for m in re.finditer(answer, c.lower())]
+            index = [(m.start(0), m.end(0)) for m in re.finditer(re.escape(answer), re.escape(c.lower()))]
 
-            print(index)
+            # print(index)
             if index == []:
                 start_idx = None
                 end_idx = None
@@ -68,6 +68,18 @@ def add_token_positions(encodings, answers):
         if end_positions[-1] is None:
             end_positions[-1] = tokenizer.model_max_length
     encodings.update({'start_positions': start_positions, 'end_positions': end_positions})
+
+
+def create_encodings(question_id_list, context_list, question_dic):
+    questions_list = list()
+
+    for q_id in question_id_list:
+        questions_list.append(question_dic[q_id])
+
+    encodings = tokenizer.encode(context_list, questions_list, max_length=512, padding=True, truncation=True,
+                                 return_tensors="pt")
+
+    return encodings
 
 
 def process_searchqa(folder, set_type): # TODO: check if data is properly processed !!
@@ -143,13 +155,7 @@ def process_quasar(folder, set_type, doc_size):
 
         question_id_list, context_list, answer_list = add_end_idx(answer_context_dict)
 
-        questions_list = list()
-
-        for q_id in question_id_list:
-            questions_list.append(question_dic[q_id])
-
-        encodings = tokenizer.encode(context_list, questions_list, max_length=512, padding=True, truncation=True,
-                                     return_tensors="pt")
+        encodings = create_encodings(question_id_list, context_list, question_dic)
 
         add_token_positions(encodings, answer_list)
 
@@ -164,7 +170,7 @@ def process_quasar(folder, set_type, doc_size):
 
         # print("Question dic of type <quasar> and set type <{}> has {} entries.".format(set_type, len(question_dic)))
         # return question_dic
-        return tokens_list
+        return encodings2
 
 
 def save_to_file(path, question_dic, type, set_type, doc_size=None):
