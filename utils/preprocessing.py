@@ -9,27 +9,65 @@ import json
 import pickle
 # Handle the file paths
 from pathlib import Path
+import re
 
 tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
 model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
                                                       return_dict=True)
 
 
-def add_end_idx(answers, contexts):
-    for answer, context in zip(answers, contexts):
-        gold_text = answer['text']
-        start_idx = answer['answer_start']
-        end_idx = start_idx + len(gold_text)
+def add_end_idx(answ_cont_dict):
+    idx_answ_cont_dict = dict()
+    question_id_list = list()
 
-        # sometimes squad answers are off by a character or two – fix this
-        if context[start_idx:end_idx] == gold_text:
-            answer['answer_end'] = end_idx
-        elif context[start_idx-1:end_idx-1] == gold_text:
-            answer['answer_start'] = start_idx - 1
-            answer['answer_end'] = end_idx - 1     # When the gold label is off by one character
-        elif context[start_idx-2:end_idx-2] == gold_text:
-            answer['answer_start'] = start_idx - 2
-            answer['answer_end'] = end_idx - 2     # When the gold label is off by two characters
+    context_list = list()
+    answers_list = list()
+
+    for key, value in answ_cont_dict.items():
+        answer = value[0]
+        context = value[1]
+
+        # gold_text = answer['text']
+
+        for c in context:
+            print(c, answer)
+
+            index = [(m.start(0), m.end(0)) for m in re.finditer(answer, c.lower())]
+
+            print(index)
+            if index == []:
+                start_idx = None
+                end_idx = None
+            else:
+                start_idx = index[0][0]
+                end_idx = index[0][1]
+
+            # answer['answer_start'] = start_idx
+            # answer['answer_end'] = end_idx
+
+            idx_answ_cont_dict[key] = {(answer, start_idx, end_idx): c}
+
+        for q_id, value2 in idx_answ_cont_dict.items():
+            for answer, context in value2.items():
+                answers_list.append({'text': answer[0], 'answer_start': answer[1], 'answer_end': answer[2]})
+                context_list.append(context)
+                question_id_list.append(q_id)
+
+    return question_id_list, context_list, answers_list
+
+
+def add_token_positions(encodings, answers):
+    start_positions = []
+    end_positions = []
+    for i in range(len(answers)):
+        start_positions.append(encodings.char_to_token(i, answers[i]['answer_start']))
+        end_positions.append(encodings.char_to_token(i, answers[i]['answer_end'] - 1))
+        # if None, the answer passage has been truncated
+        if start_positions[-1] is None:
+            start_positions[-1] = tokenizer.model_max_length
+        if end_positions[-1] is None:
+            end_positions[-1] = tokenizer.model_max_length
+    encodings.update({'start_positions': start_positions, 'end_positions': end_positions})
 
 
 def process_searchqa(folder, set_type): # TODO: check if data is properly processed !!
@@ -59,7 +97,6 @@ def process_quasar(folder, set_type, doc_size):
     :return:
     """
     # Question File and Path
-    question_dic = list()
     question_file = set_type + "_questions.json"
     question_file_path = Path("/".join([folder, "questions", question_file]))
 
@@ -73,13 +110,15 @@ def process_quasar(folder, set_type, doc_size):
         question_dic = dict()
         answer_to_question = list()
         contexts_to_answer = list()
+        answer_context_dict = dict()
 
         for line in qf:
             parsed_question = json.loads(line)
             question = parsed_question["question"]
             # print(question)
             question_id = parsed_question["uid"]
-            answer_to_question.append(parsed_question["answer"])
+            # answer_to_question.append({"text": parsed_question["answer"]})
+            answer_context_dict[question_id] = [parsed_question["answer"]]
             question_dic[question_id] = [question]
 
         for line in cf:
@@ -90,21 +129,29 @@ def process_quasar(folder, set_type, doc_size):
             answer_contexts = parsed_answer["contexts"]
             # remove scores of contexts
             cleaned_answer_contexts = [ls_elem[1] for ls_elem in answer_contexts]
-            contexts_to_answer.append(cleaned_answer_contexts)
+            # contexts_to_answer.append(cleaned_answer_contexts)
+            answer_context_dict[answer_id].append(cleaned_answer_contexts)
             # join all contexts to one single string => creates too long tokens for model
             # one_string_contexts = ' '.join(cleaned_answer_contexts)
-            question_dic[answer_id].append(cleaned_answer_contexts)
+            # question_dic[answer_id].append(cleaned_answer_contexts)
 
         # for key, value in question_dic.items():
         #    print("key: " + key)
         #    print("value: " + value)
 
         # get character position at which the answer ends in the passage
-        add_end_idx(answer_to_question, contexts_to_answer)
 
-        tokens_list = [tokenizer.encode(value[0], con, max_length=512, padding=True, truncation=True,
-                                        return_tensors="pt") for key, value in question_dic.items()
-                       for con in value[1]]
+        question_id_list, context_list, answer_list = add_end_idx(answer_context_dict)
+
+        questions_list = list()
+
+        for q_id in question_id_list:
+            questions_list.append(question_dic[q_id])
+
+        encodings = tokenizer.encode(context_list, questions_list, max_length=512, padding=True, truncation=True,
+                                     return_tensors="pt")
+
+        add_token_positions(encodings, answer_list)
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
         # nested list
