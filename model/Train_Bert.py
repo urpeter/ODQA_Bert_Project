@@ -6,6 +6,9 @@ import utils.preprocessing
 import os
 import torch
 import pickle
+# Initialize wandb for logging
+import wandb
+wandb.init(project="Bert_ODQA")
 
 def load_pickled_glove(GLOVE_PATH):
     return pickle.load(open(f'../outputs/glove_dict.pkl', 'rb'))
@@ -35,6 +38,7 @@ def main(train_encodings,val_encodings):
             outputs = model(input_ids, attention_mask=attention_mask, start_positions=start_positions,
                             end_positions=end_positions)
             loss = outputs[0]
+            wandb.log({'training loss (extraction)': loss})
             loss.backward()
             optim.step()
 
@@ -43,7 +47,7 @@ def main(train_encodings,val_encodings):
 
 if __name__ == '__main__':
 
-    infile = open(filename, 'rb')
+    infile = open("question and answer_cont_files", 'rb')
     new_dict = pickle.load(infile)
     infile.close()
     main()
