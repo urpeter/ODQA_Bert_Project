@@ -35,14 +35,17 @@ def add_end_idx(answ_cont_dict):
             index = [(m.start(0), m.end(0)) for m in re.finditer(answer, c)]
 
             print(index)
-
-            start_idx = index[0][0]
-            end_idx = index[0][1]
+            if index == []:
+                start_idx = None
+                end_idx = None
+            else:
+                start_idx = index[0][0]
+                end_idx = index[0][1]
 
             # answer['answer_start'] = start_idx
             # answer['answer_end'] = end_idx
 
-            idx_answ_cont_dict[key] = {(gold_text, start_idx, end_idx): c}
+            idx_answ_cont_dict[key] = {(answer, start_idx, end_idx): c}
 
         for q_id, value2 in idx_answ_cont_dict.items():
             for answer, context in value2.items():
