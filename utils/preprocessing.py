@@ -23,7 +23,7 @@ def add_end_idx(answ_cont_dict):
     context_list = list()
     answers_list = list()
 
-    for key, value in answ_cont_dict.items:
+    for key, value in answ_cont_dict.items():
         answer = value[0]
         context = value[1]
 
