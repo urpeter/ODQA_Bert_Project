@@ -87,19 +87,20 @@ def create_encodings(question_id_list, context_list, question_dic):
 def process_searchqa(folder, set_type): # TODO: check if data is properly processed !!
     answer_context_dic = dict()
     question_list = []
+    question_dict = dict()
     file_path = Path("/".join([folder, 'train_val_test_json_split', 'data_json', set_type]))
+
     for filename in os.listdir(file_path):
         with open(os.path.join(file_path, filename), "r") as f:
+
             json_data = json.loads(f.read().replace(r" \n", " "))
-            answer_context_dic[json_data["id"]] = [{"text":json_data["answer"]},[c["snippet"] for c in json_data["search_results"] if c["snippet"] is not None]]
-            question_list.append(json_data["question"])
-           # question_dic[json_data["id"]] = {"question": , "answer": json_data["answer"],a
-            #tokens_list = [tokenizer.encode_plus(json_data["question"], c["snippet"], max_length=512,
-             #                                    padding=True, truncation=True, return_tensors="pt")
-              #for c in json_data["search_results"] if c["snippet"] is not None]
-            # TODO: FOR REINFORCEMENT LEARNING!
-            # answer_dic =
-    return answer_context_dic, question_list
+            answer_context_dic[json_data["id"]] = {json_data["answer"]:[c["snippet"] for c in json_data["search_results"] if c["snippet"] is not None]}
+            question_dict[json_data["id"]] = [json_data["question"]]
+
+    question_id_list, context_list, answer_list = add_end_idx(answer_context_dic)
+    encodings = create_encodings(question_id_list, context_list, question_dict)
+    New_encodings = add_token_positions(encodings, answer_list)
+    return New_encodings
 
 
 def process_quasar(folder, set_type, doc_size):
@@ -218,6 +219,7 @@ def main(type, folder, set_type, doc_size):
         return process_quasar(folder, set_type, doc_size)
     elif type == "searchqa":
         return process_searchqa(folder, set_type)
+
     # else:
     # A wrong type should be identified by argparse already but this is another safeguard
     return ValueError("type must be either 'quasar' or 'searchqa'")

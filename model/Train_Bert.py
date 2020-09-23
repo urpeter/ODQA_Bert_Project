@@ -1,17 +1,21 @@
+from pathlib import Path
+
 from model.ODQA_Dataset import ODQA_Dataset
 from transformers import AutoModelForQuestionAnswering
 from torch.utils.data import DataLoader
 from transformers import AdamW
 import utils.preprocessing
 import os
+from argparse import ArgumentParser
 import torch
 import pickle
 # Initialize wandb for logging
 import wandb
 wandb.init(project="Bert_ODQA")
 
-def load_pickled_glove(GLOVE_PATH):
-    return pickle.load(open(f'../outputs/glove_dict.pkl', 'rb'))
+#TODO load training encodings
+#def load_pickled_glove(GLOVE_PATH):
+ #   return pickle.load(open(f'../outputs/glove_dict.pkl', 'rb'))
 
 def main(train_encodings,val_encodings):
     model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
@@ -24,7 +28,7 @@ def main(train_encodings,val_encodings):
     model.to(device)
     model.train()
 
-    train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=100, shuffle=True)
 
     optim = AdamW(model.parameters(), lr=5e-5)
 
@@ -46,8 +50,19 @@ def main(train_encodings,val_encodings):
 
 
 if __name__ == '__main__':
+    parser = ArgumentParser(description='Training script')
+    parser.add_argument('--out', default='/local/anasbori/outputs', type=str, help='Path to output directory')
 
-    infile = open("question and answer_cont_files", 'rb')
-    new_dict = pickle.load(infile)
+    # Parse given arguments
+    args = parser.parse_args()
+    print(args.out)
+
+    # Input paths
+    dirpath = args.out
+    SEARCHQA_VAL = Path("/".join([dirpath, 'searchqa_val.pkl']))
+    QUASAR_DEV = Path("/".join([dirpath, 'quasar_dev_short.pkl']))
+
+    infile = open(QUASAR_DEV, 'rb')
+    trainset,valset = pickle.load(infile)
     infile.close()
-    main()
+    main(trainset,valset)
