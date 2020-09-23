@@ -70,6 +70,18 @@ def add_token_positions(encodings, answers):
     encodings.update({'start_positions': start_positions, 'end_positions': end_positions})
 
 
+def create_encodings(question_id_list, context_list, question_dic):
+    questions_list = list()
+
+    for q_id in question_id_list:
+        questions_list.append(question_dic[q_id])
+
+    encodings = tokenizer.encode(context_list, questions_list, max_length=512, padding=True, truncation=True,
+                                 return_tensors="pt")
+
+    return encodings
+
+
 def process_searchqa(folder, set_type): # TODO: check if data is properly processed !!
     answer_dic = dict()
     # question_dic = {}
@@ -141,13 +153,7 @@ def process_quasar(folder, set_type, doc_size):
 
         question_id_list, context_list, answer_list = add_end_idx(answer_context_dict)
 
-        questions_list = list()
-
-        for q_id in question_id_list:
-            questions_list.append(question_dic[q_id])
-
-        encodings = tokenizer.encode(context_list, questions_list, max_length=512, padding=True, truncation=True,
-                                     return_tensors="pt")
+        encodings = create_encodings(question_id_list, context_list, question_dic)
 
         add_token_positions(encodings, answer_list)
 
@@ -162,7 +168,7 @@ def process_quasar(folder, set_type, doc_size):
 
         # print("Question dic of type <quasar> and set type <{}> has {} entries.".format(set_type, len(question_dic)))
         # return question_dic
-        return encodings
+        return encodings2
 
 
 def save_to_file(path, question_dic, type, set_type, doc_size=None):
