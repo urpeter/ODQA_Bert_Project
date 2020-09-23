@@ -64,19 +64,21 @@ def add_token_positions(encodings, answers):
 
 
 def process_searchqa(folder, set_type): # TODO: check if data is properly processed !!
-    answer_dic = dict()
-    # question_dic = {}
+    answer_context_dic = dict()
+    question_list = []
     file_path = Path("/".join([folder, 'train_val_test_json_split', 'data_json', set_type]))
     for filename in os.listdir(file_path):
         with open(os.path.join(file_path, filename), "r") as f:
             json_data = json.loads(f.read().replace(r" \n", " "))
-            answer_dic[json_data["id"]] = {json_data["answer"]}
-            tokens_list = [tokenizer.encode_plus(json_data["question"], c["snippet"], max_length=512,
-                                                 padding=True, truncation=True, return_tensors="pt")
-                           for c in json_data["search_results"] if c["snippet"] is not None]
+            answer_context_dic[json_data["id"]] = [{"text":json_data["answer"]},[c["snippet"] for c in json_data["search_results"] if c["snippet"] is not None]]
+            question_list.append(json_data["question"])
+           # question_dic[json_data["id"]] = {"question": , "answer": json_data["answer"],a
+            #tokens_list = [tokenizer.encode_plus(json_data["question"], c["snippet"], max_length=512,
+             #                                    padding=True, truncation=True, return_tensors="pt")
+              #for c in json_data["search_results"] if c["snippet"] is not None]
             # TODO: FOR REINFORCEMENT LEARNING!
             # answer_dic =
-    return tokens_list, answer_dic
+    return answer_context_dic, question_list
 
 
 def process_quasar(folder, set_type, doc_size):
