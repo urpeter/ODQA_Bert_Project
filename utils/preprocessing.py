@@ -49,7 +49,7 @@ def add_end_idx(answ_cont_dict):
 
         for q_id, value2 in idx_answ_cont_dict.items():
             for answer, context in value2.items():
-                answers_list.append({'text': answer[0], 'answer_start': answer[1], 'answer_end': answer[2]})
+                answers_list.append([{'text': answer[0], 'answer_start': answer[1], 'answer_end': answer[2]}])
                 context_list.append(context)
                 question_id_list.append(q_id)
 
