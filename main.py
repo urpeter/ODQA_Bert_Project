@@ -1,6 +1,6 @@
-def preproc(encodings):
+#def preproc(encodings):
 
-def Train
-def Run():
+#def Train
+#def Run():
 
-if __name__ == '__main__':
+#if __name__ == '__main__':
