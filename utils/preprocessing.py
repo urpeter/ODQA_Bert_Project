@@ -11,9 +11,11 @@ import pickle
 from pathlib import Path
 import re
 
-tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
-model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
-                                                      return_dict=True)
+# tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
+tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
+# model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
+# return_dict=True)
+model = DistilBertForQuestionAnswering.from_pretrained("distilbert-base-uncased")
 
 
 def add_end_idx(answ_cont_dict):
@@ -60,13 +62,18 @@ def add_token_positions(encodings, answers):
     start_positions = []
     end_positions = []
     for i in range(len(answers)):
-        start_positions.append(encodings.char_to_token(i, answers[i]['answer_start']))
-        end_positions.append(encodings.char_to_token(i, answers[i]['answer_end'] - 1))
-        # if None, the answer passage has been truncated
-        if start_positions[-1] is None:
-            start_positions[-1] = tokenizer.model_max_length
-        if end_positions[-1] is None:
-            end_positions[-1] = tokenizer.model_max_length
+        if answers[i]['answer_start'] is None:
+            start_positions.append(encodings.char_to_token(i, 0))
+            end_positions.append(encodings.char_to_token(i, 0))
+            # if None, the answer passage has been truncated
+        else:
+            start_positions.append(encodings.char_to_token(i, answers[i]['answer_start']))
+            end_positions.append(encodings.char_to_token(i, answers[i]['answer_end'] - 1))
+            # if None, the answer passage has been truncated
+            if start_positions[-1] is None:
+                start_positions[-1] = tokenizer.model_max_length
+            if end_positions[-1] is None:
+                end_positions[-1] = tokenizer.model_max_length
     encodings.update({'start_positions': start_positions, 'end_positions': end_positions})
 
     return encodings
@@ -78,8 +85,7 @@ def create_encodings(question_id_list, context_list, question_dic):
     for q_id in question_id_list:
         questions_list.append(question_dic[q_id])
 
-    encodings = tokenizer.encode(context_list, questions_list, max_length=512, padding=True, truncation=True,
-                                 return_tensors="pt")
+    encodings = tokenizer(context_list, questions_list, padding=True, truncation=True)
 
     return encodings
 
@@ -219,7 +225,6 @@ def main(type, folder, set_type, doc_size):
         return process_quasar(folder, set_type, doc_size)
     elif type == "searchqa":
         return process_searchqa(folder, set_type)
-
     # else:
     # A wrong type should be identified by argparse already but this is another safeguard
     return ValueError("type must be either 'quasar' or 'searchqa'")
