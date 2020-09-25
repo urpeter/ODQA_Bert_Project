@@ -94,7 +94,7 @@ def create_encodings(question_id_list, context_list, question_dic):
 
 def process_searchqa(folder, set_type): # TODO: check if data is properly processed !!
     answer_context_dic = dict()
-    question_list = []
+   # question_list = []
     question_dict = dict()
     file_path = Path("/".join([folder, 'train_val_test_json_split', 'data_json', set_type]))
 
