@@ -79,11 +79,11 @@ def create_encodings(question_id_list, context_list, question_dic):
         questions_list.append(question_dic[q_id])
 
     while True:
-        if len(questions_list) > 2000:
-            short_quest = questions_list[:2000]
-            questions_list = questions_list[2000:]
-            short_cont = context_list[:2000]
-            context_list = context_list[2000:]
+        if len(questions_list) > 1500:
+            short_quest = questions_list[:15000]
+            questions_list = questions_list[1500:]
+            short_cont = context_list[:1500]
+            context_list = context_list[1500:]
             encodings.append(tokenizer(short_cont, short_quest, padding=True, truncation=True))
         else:
             encodings.append(tokenizer(context_list, questions_list, padding=True, truncation=True))
@@ -94,7 +94,6 @@ def create_encodings(question_id_list, context_list, question_dic):
 
 def process_searchqa(folder, set_type): # TODO: check if data is properly processed !!
     answer_dic = dict()
-    # question_dic = {}
     file_path = Path("/".join([folder, 'train_val_test_json_split', 'data_json', set_type]))
     for filename in os.listdir(file_path):
         with open(os.path.join(file_path, filename), "r") as f:
@@ -128,16 +127,12 @@ def process_quasar(folder, set_type, doc_size):
         # Parse each line separate to avoid memory issues
 
         question_dic = dict()
-        answer_to_question = list()
-        contexts_to_answer = list()
         answer_context_dict = dict()
 
         for line in qf:
             parsed_question = json.loads(line)
             question = parsed_question["question"]
-            # print(question)
             question_id = parsed_question["uid"]
-            # answer_to_question.append({"text": parsed_question["answer"]})
             answer_context_dict[question_id] = [parsed_question["answer"]]
             question_dic[question_id] = question
 
@@ -149,22 +144,10 @@ def process_quasar(folder, set_type, doc_size):
             answer_contexts = parsed_answer["contexts"]
             # remove scores of contexts
             cleaned_answer_contexts = [ls_elem[1] for ls_elem in answer_contexts]
-            # contexts_to_answer.append(cleaned_answer_contexts)
             answer_context_dict[answer_id].append(cleaned_answer_contexts)
-            # join all contexts to one single string => creates too long tokens for model
-            # one_string_contexts = ' '.join(cleaned_answer_contexts)
-            # question_dic[answer_id].append(cleaned_answer_contexts)
-
-        # for key, value in question_dic.items():
-        #    print("key: " + key)
-        #    print("value: " + value)
-
-        # get character position at which the answer ends in the passage
 
         question_id_list, context_list, answer_list = add_end_idx(answer_context_dict)
-
         encodings = create_encodings(question_id_list, context_list, question_dic)
-
         encodings2 = add_token_positions(encodings, answer_list)
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
