@@ -80,12 +80,22 @@ def add_token_positions(encodings, answers):
 
 
 def create_encodings(question_id_list, context_list, question_dic):
+    encodings = list()
     questions_list = list()
 
     for q_id in question_id_list:
         questions_list.append(question_dic[q_id])
 
-    encodings = tokenizer(context_list, questions_list, padding=True, truncation=True)
+    while True:
+        if len(questions_list) > 2000:
+            short_quest = questions_list[:2000]
+            questions_list = questions_list[2000:]
+            short_cont = context_list[:2000]
+            context_list = context_list[2000:]
+            encodings.append(tokenizer(context_list, questions_list, padding=True, truncation=True))
+        else:
+            encodings.append(tokenizer(context_list, questions_list, padding=True, truncation=True))
+            break
 
     return encodings
 
