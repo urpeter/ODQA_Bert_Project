@@ -80,7 +80,7 @@ def create_encodings(question_id_list, context_list, question_dic):
 
     while True:
         if len(questions_list) > 1500:
-            short_quest = questions_list[:15000]
+            short_quest = questions_list[:1500]
             questions_list = questions_list[1500:]
             short_cont = context_list[:1500]
             context_list = context_list[1500:]
