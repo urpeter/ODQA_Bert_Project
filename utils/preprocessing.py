@@ -1,4 +1,4 @@
-from transformers import AutoModelForQuestionAnswering, AutoTokenizer
+from transformers import DistilBertForQuestionAnswering, DistilBertTokenizerFast
 import torch
 import os
 # Command line interaction
@@ -11,9 +11,11 @@ import pickle
 from pathlib import Path
 import re
 
-tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
-model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
-                                                      return_dict=True)
+# tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
+tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
+# model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
+# return_dict=True)
+model = DistilBertForQuestionAnswering.from_pretrained("distilbert-base-uncased")
 
 
 def add_end_idx(answ_cont_dict):
@@ -78,8 +80,7 @@ def create_encodings(question_id_list, context_list, question_dic):
     for q_id in question_id_list:
         questions_list.append(question_dic[q_id])
 
-    encodings = tokenizer.encode(context_list, questions_list, max_length=512, padding=True, truncation=True,
-                                 return_tensors="pt")
+    encodings = tokenizer.encode(context_list, questions_list, padding=True, truncation=True)
 
     return encodings
 
