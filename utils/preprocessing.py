@@ -245,6 +245,7 @@ if __name__ == '__main__':
     args = parser.parse_args() # Argparse returns a namespace object
 
     # Call the main function with with the argparse arguments
+
     test_dic = main(type=args.TYPE, folder=args.FOLDERPATH, set_type=args.SETTYPE, doc_size=args.DOCSIZE)
     output_path = Path(os.getcwd() + '/outputs')
     save_to_file(output_path, test_dic, args.TYPE, args.SETTYPE, args.DOCSIZE)

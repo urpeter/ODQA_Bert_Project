@@ -5,6 +5,5 @@ from model.Train_Bert import training
 def run():
     training() # still need to distinguish between dev and trainfiles -> for loop for files
 
-
 if __name__ == '__main__':
     run()
