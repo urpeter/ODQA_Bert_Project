@@ -80,7 +80,7 @@ def create_encodings(question_id_list, context_list, question_dic):
     for q_id in question_id_list:
         questions_list.append(question_dic[q_id])
 
-    encodings = tokenizer.encode(context_list, questions_list, padding=True, truncation=True)
+    encodings = tokenizer(context_list, questions_list, padding=True, truncation=True)
 
     return encodings
 
@@ -93,7 +93,7 @@ def process_searchqa(folder, set_type): # TODO: check if data is properly proces
         with open(os.path.join(file_path, filename), "r") as f:
             json_data = json.loads(f.read().replace(r" \n", " "))
             answer_dic[json_data["id"]] = {json_data["answer"]}
-            tokens_list = [tokenizer.encode_plus(json_data["question"], c["snippet"], max_length=512,
+            tokens_list = [tokenizer(json_data["question"], c["snippet"], max_length=512,
                                                  padding=True, truncation=True, return_tensors="pt")
                            for c in json_data["search_results"] if c["snippet"] is not None]
             # TODO: FOR REINFORCEMENT LEARNING!
