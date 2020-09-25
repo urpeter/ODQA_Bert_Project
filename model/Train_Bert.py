@@ -1,5 +1,4 @@
 from pathlib import Path
-
 from model.ODQA_Dataset import ODQA_Dataset
 from transformers import AutoModelForQuestionAnswering
 from torch.utils.data import DataLoader
@@ -13,18 +12,26 @@ import pickle
 import wandb
 wandb.init(project="Bert_ODQA")
 
-#TODO load training encodings
-#def load_pickled_glove(GLOVE_PATH):
- #   return pickle.load(open(f'../outputs/glove_dict.pkl', 'rb'))
+# Returns the model
+def training():
 
-def main(train_encodings,val_encodings):
+    # Input paths
+    dirpath = "../outputs"  # args.out
+    SEARCHQA_VAL = Path("/".join([dirpath, 'searchqa_val.pkl']))
+    QUASAR_DEV = Path("/".join([dirpath, 'quasar_dev_short.pkl']))
+    # Open Pickled file
+    infile = open(QUASAR_DEV, 'rb')
+    encodings = pickle.load(infile)
+    infile.close()
+    #Init model
     model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
-                                                          return_dict=True)
-    train_dataset = ODQA_Dataset(train_encodings)
-    val_dataset = ODQA_Dataset(val_encodings)
+                                                     return_dict=True)
+    train_dataset = ODQA_Dataset(encodings)
+    #val_dataset = ODQA_Dataset(encodings)
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
+    print("Start Training")
+    # Train on Dataset
     model.to(device)
     model.train()
 
@@ -46,23 +53,17 @@ def main(train_encodings,val_encodings):
             loss.backward()
             optim.step()
 
-    model.eval()
+    #model.eval()
 
+    return model
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Training script')
+    training()
+    print("Training Done")
+    '''parser = ArgumentParser(description='Training script')
     parser.add_argument('--out', default='/local/anasbori/outputs', type=str, help='Path to output directory')
 
     # Parse given arguments
     args = parser.parse_args()
-    print(args.out)
+    print(args.out)'''
 
-    # Input paths
-    dirpath = args.out
-    SEARCHQA_VAL = Path("/".join([dirpath, 'searchqa_val.pkl']))
-    QUASAR_DEV = Path("/".join([dirpath, 'quasar_dev_short.pkl']))
-
-    infile = open(QUASAR_DEV, 'rb')
-    trainset,valset = pickle.load(infile)
-    infile.close()
-    main(trainset,valset)

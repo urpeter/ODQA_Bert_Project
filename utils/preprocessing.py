@@ -11,9 +11,11 @@ import pickle
 from pathlib import Path
 import re
 
-tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
-model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
-                                                      return_dict=True)
+# tokenizer = AutoTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
+tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
+# model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
+# return_dict=True)
+model = DistilBertForQuestionAnswering.from_pretrained("distilbert-base-uncased")
 
 
 def add_end_idx(answ_cont_dict):
@@ -27,23 +29,15 @@ def add_end_idx(answ_cont_dict):
         answer = value[0]
         context = value[1]
 
-        # gold_text = answer['text']
-
         for c in context:
-            # print('c: ', c, 'answer: ', answer)
-
             index = [(m.start(0), m.end(0)) for m in re.finditer(re.escape(answer), re.escape(c.lower()))]
 
-            # print(index)
             if index == []:
                 start_idx = None
                 end_idx = None
             else:
                 start_idx = index[0][0]
                 end_idx = index[0][1]
-
-            # answer['answer_start'] = start_idx
-            # answer['answer_end'] = end_idx
 
             idx_answ_cont_dict[key] = {(answer, start_idx, end_idx): c}
 
@@ -60,33 +54,47 @@ def add_token_positions(encodings, answers):
     start_positions = []
     end_positions = []
     for i in range(len(answers)):
-        start_positions.append(encodings.char_to_token(i, answers[i]['answer_start']))
-        end_positions.append(encodings.char_to_token(i, answers[i]['answer_end'] - 1))
-        # if None, the answer passage has been truncated
-        if start_positions[-1] is None:
-            start_positions[-1] = tokenizer.model_max_length
-        if end_positions[-1] is None:
-            end_positions[-1] = tokenizer.model_max_length
+        if answers[i]['answer_start'] is None:
+            start_positions.append(encodings.char_to_token(i, 0))
+            end_positions.append(encodings.char_to_token(i, 0))
+            # if None, the answer passage has been truncated
+        else:
+            start_positions.append(encodings.char_to_token(i, answers[i]['answer_start']))
+            end_positions.append(encodings.char_to_token(i, answers[i]['answer_end'] - 1))
+            # if None, the answer passage has been truncated
+            if start_positions[-1] is None:
+                start_positions[-1] = tokenizer.model_max_length
+            if end_positions[-1] is None:
+                end_positions[-1] = tokenizer.model_max_length
     encodings.update({'start_positions': start_positions, 'end_positions': end_positions})
 
     return encodings
 
 
 def create_encodings(question_id_list, context_list, question_dic):
+    encodings = list()
     questions_list = list()
 
     for q_id in question_id_list:
         questions_list.append(question_dic[q_id])
 
-    encodings = tokenizer.encode(context_list, questions_list, max_length=512, padding=True, truncation=True,
-                                 return_tensors="pt")
+    while True:
+        if len(questions_list) > 2000:
+            short_quest = questions_list[:2000]
+            questions_list = questions_list[2000:]
+            short_cont = context_list[:2000]
+            context_list = context_list[2000:]
+            encodings.append(tokenizer(short_cont, short_quest, padding=True, truncation=True))
+        else:
+            encodings.append(tokenizer(context_list, questions_list, padding=True, truncation=True))
+            break
 
     return encodings
 
 
 def process_searchqa(folder, set_type): # TODO: check if data is properly processed !!
     answer_context_dic = dict()
-    question_list = []
+   # question_list = []
     question_dict = dict()
     file_path = Path("/".join([folder, 'train_val_test_json_split', 'data_json', set_type]))
 
@@ -219,7 +227,6 @@ def main(type, folder, set_type, doc_size):
         return process_quasar(folder, set_type, doc_size)
     elif type == "searchqa":
         return process_searchqa(folder, set_type)
-
     # else:
     # A wrong type should be identified by argparse already but this is another safeguard
     return ValueError("type must be either 'quasar' or 'searchqa'")
