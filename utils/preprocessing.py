@@ -79,11 +79,11 @@ def create_encodings(question_id_list, context_list, question_dic):
         questions_list.append(question_dic[q_id])
 
     while True:
-        if len(questions_list) > 1500:
-            short_quest = questions_list[:1500]
-            questions_list = questions_list[1500:]
-            short_cont = context_list[:1500]
-            context_list = context_list[1500:]
+        if len(questions_list) > 1000:
+            short_quest = questions_list[:1000]
+            questions_list = questions_list[1000:]
+            short_cont = context_list[:1000]
+            context_list = context_list[1000:]
             encodings.append(tokenizer(short_cont, short_quest, padding=True, truncation=True))
         else:
             encodings.append(tokenizer(context_list, questions_list, padding=True, truncation=True))
