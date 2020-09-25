@@ -29,23 +29,15 @@ def add_end_idx(answ_cont_dict):
         answer = value[0]
         context = value[1]
 
-        # gold_text = answer['text']
-
         for c in context:
-            # print('c: ', c, 'answer: ', answer)
-
             index = [(m.start(0), m.end(0)) for m in re.finditer(re.escape(answer), re.escape(c.lower()))]
 
-            # print(index)
             if index == []:
                 start_idx = None
                 end_idx = None
             else:
                 start_idx = index[0][0]
                 end_idx = index[0][1]
-
-            # answer['answer_start'] = start_idx
-            # answer['answer_end'] = end_idx
 
             idx_answ_cont_dict[key] = {(answer, start_idx, end_idx): c}
 
@@ -92,7 +84,7 @@ def create_encodings(question_id_list, context_list, question_dic):
             questions_list = questions_list[2000:]
             short_cont = context_list[:2000]
             context_list = context_list[2000:]
-            encodings.append(tokenizer(context_list, questions_list, padding=True, truncation=True))
+            encodings.append(tokenizer(short_cont, short_quest, padding=True, truncation=True))
         else:
             encodings.append(tokenizer(context_list, questions_list, padding=True, truncation=True))
             break
