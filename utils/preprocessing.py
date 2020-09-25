@@ -62,13 +62,18 @@ def add_token_positions(encodings, answers):
     start_positions = []
     end_positions = []
     for i in range(len(answers)):
-        start_positions.append(encodings.char_to_token(i, answers[i]['answer_start']))
-        end_positions.append(encodings.char_to_token(i, answers[i]['answer_end'] - 1))
-        # if None, the answer passage has been truncated
-        if start_positions[-1] is None:
-            start_positions[-1] = tokenizer.model_max_length
-        if end_positions[-1] is None:
-            end_positions[-1] = tokenizer.model_max_length
+        if answers[i]['answer_start'] is None:
+            start_positions.append(encodings.char_to_token(i, 0))
+            end_positions.append(encodings.char_to_token(i, 0))
+            # if None, the answer passage has been truncated
+        else:
+            start_positions.append(encodings.char_to_token(i, answers[i]['answer_start']))
+            end_positions.append(encodings.char_to_token(i, answers[i]['answer_end'] - 1))
+            # if None, the answer passage has been truncated
+            if start_positions[-1] is None:
+                start_positions[-1] = tokenizer.model_max_length
+            if end_positions[-1] is None:
+                end_positions[-1] = tokenizer.model_max_length
     encodings.update({'start_positions': start_positions, 'end_positions': end_positions})
 
     return encodings
