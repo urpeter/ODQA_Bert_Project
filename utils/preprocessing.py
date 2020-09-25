@@ -1,4 +1,4 @@
-from transformers import AutoModelForQuestionAnswering, AutoTokenizer
+from transformers import DistilBertForQuestionAnswering, DistilBertTokenizerFast
 import torch
 import os
 # Command line interaction
@@ -79,11 +79,11 @@ def create_encodings(question_id_list, context_list, question_dic):
         questions_list.append(question_dic[q_id])
 
     while True:
-        if len(questions_list) > 2000:
-            short_quest = questions_list[:2000]
-            questions_list = questions_list[2000:]
-            short_cont = context_list[:2000]
-            context_list = context_list[2000:]
+        if len(questions_list) > 1000:
+            short_quest = questions_list[:1000]
+            questions_list = questions_list[1000:]
+            short_cont = context_list[:1000]
+            context_list = context_list[1000:]
             encodings.append(tokenizer(short_cont, short_quest, padding=True, truncation=True))
         else:
             encodings.append(tokenizer(context_list, questions_list, padding=True, truncation=True))
@@ -152,22 +152,10 @@ def process_quasar(folder, set_type, doc_size):
             answer_contexts = parsed_answer["contexts"]
             # remove scores of contexts
             cleaned_answer_contexts = [ls_elem[1] for ls_elem in answer_contexts]
-            # contexts_to_answer.append(cleaned_answer_contexts)
             answer_context_dict[answer_id].append(cleaned_answer_contexts)
-            # join all contexts to one single string => creates too long tokens for model
-            # one_string_contexts = ' '.join(cleaned_answer_contexts)
-            # question_dic[answer_id].append(cleaned_answer_contexts)
-
-        # for key, value in question_dic.items():
-        #    print("key: " + key)
-        #    print("value: " + value)
-
-        # get character position at which the answer ends in the passage
 
         question_id_list, context_list, answer_list = add_end_idx(answer_context_dict)
-
         encodings = create_encodings(question_id_list, context_list, question_dic)
-
         encodings2 = add_token_positions(encodings, answer_list)
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
