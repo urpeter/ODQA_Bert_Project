@@ -164,7 +164,7 @@ def process_quasar(folder, set_type, doc_size):
                         break
 
                 # add information where answer in context is
-                context_list, answer_list = add_end_idx(data_dict)
+                answer_list = add_end_idx(data_dict)
 
                 # create the batch-encodings
                 batches_data.append(create_encodings(data_dict, answer_list))
