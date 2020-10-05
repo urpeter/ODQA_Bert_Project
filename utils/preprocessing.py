@@ -73,7 +73,7 @@ def create_context_and_qustions_lists(data_to_lists_dict):
 
     for q_id, data in data_to_lists_dict.items():
         context_list.extend(data["contexts"])
-        question_list.append([data["question"]] * len(data["contexts"]))
+        question_list.extend([data["question"]] * len(data["contexts"]))
 
     return context_list, question_list
 
