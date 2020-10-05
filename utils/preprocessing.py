@@ -162,6 +162,8 @@ def process_quasar(folder, set_type, doc_size):
                     if contexts_counter == 30:
                         break
 
+                print(contexts_counter)
+
                 # add information where answer in context is
                 answer_list = add_end_idx(data_dict)
 
@@ -171,7 +173,7 @@ def process_quasar(folder, set_type, doc_size):
                 if len(batches_data) == 3000:
                     counter += 1
                     # def save_to_file(path, question_dic, type, set_type, doc_size=None):
-                    save_batch_files("./batch_output", batches_data, counter)
+                    save_batch_files("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output/", batches_data, counter)
                     question_id_list.clear()
                     batches_data.clear()
                     data_dict.clear()
