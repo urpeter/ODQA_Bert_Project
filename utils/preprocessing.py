@@ -20,14 +20,13 @@ model = DistilBertForQuestionAnswering.from_pretrained("distilbert-base-uncased"
 
 def add_end_idx(answ_cont_dict):
     idx_answ_cont_dict = dict()
-    question_id_list = list()
 
     context_list = list()
     answers_list = list()
 
     for key, value in answ_cont_dict.items():
-        answer = value[0]
-        context = value[1]
+        answer = value["answer"]
+        context = value["contexts"]
 
         for c in context:
             index = [(m.start(0), m.end(0)) for m in re.finditer(re.escape(answer), re.escape(c.lower()))]
@@ -44,10 +43,10 @@ def add_end_idx(answ_cont_dict):
         for q_id, value2 in idx_answ_cont_dict.items():
             for answer, context in value2.items():
                 answers_list.append({'text': answer[0], 'answer_start': answer[1], 'answer_end': answer[2]})
-                context_list.append(context)
-                question_id_list.append(q_id)
+                # context_list.append(context)
+                # question_id_list.append(q_id)
 
-    return question_id_list, context_list, answers_list
+    return answers_list
 
 
 def add_token_positions(encodings, answers):
@@ -68,39 +67,31 @@ def add_token_positions(encodings, answers):
                 end_positions[-1] = tokenizer.model_max_length
     encodings.update({'start_positions': start_positions, 'end_positions': end_positions})
 
-    return encodings
+    # return encodings
 
 
-def create_encodings(question_id_list, context_list, question_dic):
-    encodings = list()
-    questions_list = list()
+def create_context_and_qustions_lists(data_to_lists_dict):
+    context_list = list()
+    question_list = list()
 
-    for q_id in question_id_list:
-        #questions_list.append(question_dic[q_id])
-        context = context_list.pop(-1)
-        question = question_dic[q_id]
-        encodings.append(tokenizer(context, question, padding=True, truncation=True))
+    for q_id, data in data_to_lists_dict:
+        context_list.append(data["contexts"])
+        question_list.append(data["question"] * len(data["contexts"]))
 
-   # while True:
-   #      print(len(questions_list))
-   #      if len(questions_list) > 30000:
-   #          short_quest = questions_list[:30000]
-   #          del questions_list[:30000]
-   #          # questions_list = questions_list[1000:]
-   #          short_cont = context_list[:30000]
-   #          del context_list[:30000]
-   #          # context_list = context_list[500:]
-   #          encodings.append(tokenizer(short_cont, short_quest, padding=True, truncation=True))
-   #      else:
-   #          encodings.append(tokenizer(context_list, questions_list, padding=True, truncation=True))
-   #          break
+    return context_list, question_list
 
+
+def create_encodings(data_dict, answer_list):
+    context_list, question_list = create_context_and_qustions_lists(data_dict)
+
+    encodings = tokenizer(context_list, question_list, padding=True, truncation=True)
+    add_token_positions(encodings, answer_list)
     return encodings
 
 
 def process_searchqa(folder, set_type): # TODO: check if data is properly processed !!
     answer_context_dic = dict()
-   # question_list = []
+    # question_list = []
     question_dict = dict()
     file_path = Path("/".join([folder, 'train_val_test_json_split', 'data_json', set_type]))
 
@@ -113,10 +104,11 @@ def process_searchqa(folder, set_type): # TODO: check if data is properly proces
                                                                         if c["snippet"] is not None]}
             question_dict[json_data["id"]] = [json_data["question"]]
 
-    question_id_list, context_list, answer_list = add_end_idx(answer_context_dic)
-    encodings = create_encodings(question_id_list, context_list, question_dict)
-    New_encodings = add_token_positions(encodings, answer_list)
-    return New_encodings
+    answer_list = add_end_idx(answer_context_dic)
+    encodings = create_encodings(question_dict, answer_list)
+    # New_encodings = add_token_positions(encodings, answer_list)
+    # return New_encodings
+    # TODO: adjust according to quasar !!!
 
 
 def process_quasar(folder, set_type, doc_size):
@@ -127,6 +119,10 @@ def process_quasar(folder, set_type, doc_size):
     :param doc_size: short or large
     :return:
     """
+
+    # create counter for enumeration of batch-files
+    counter = 0
+
     # Question File and Path
     question_file = set_type + "_questions.json"
     question_file_path = Path("/".join([folder, "questions", question_file]))
@@ -136,35 +132,51 @@ def process_quasar(folder, set_type, doc_size):
     context_file_path = Path("/".join([folder, "contexts", doc_size, context_file]))
 
     with open(question_file_path, "r") as qf, open(context_file_path, "r") as cf:
+        question_id_list = list()
+        data_dict = dict()
+        batches_data = list()
+
         # Parse each line separate to avoid memory issues
-
-        question_dic = dict()
-        answer_to_question = list()
-        contexts_to_answer = list()
-        answer_context_dict = dict()
-
         for line in qf:
             parsed_question = json.loads(line)
-            question = parsed_question["question"]
-            # print(question)
             question_id = parsed_question["uid"]
-            # answer_to_question.append({"text": parsed_question["answer"]})
-            answer_context_dict[question_id] = [parsed_question["answer"]]
-            question_dic[question_id] = question
+            question_id_list.append(question_id)
+            data_dict[question_id] = [{"answer": parsed_question["answer"]}]
+            # answer_context_dict[question_id] = [parsed_question["answer"]]
+            data_dict[question_id].append({"question": parsed_question["question"]})
+            # question_dic[question_id] = question
 
-        for line in cf:
-            parsed_answer = json.loads(line)
-            # Answer ID should have a corresponding question ID
-            answer_id = parsed_answer["uid"]
-            # List of contexts with retrieval scores, contexts are sorted from highest to lowest score
-            answer_contexts = parsed_answer["contexts"]
-            # remove scores of contexts
-            cleaned_answer_contexts = [ls_elem[1] for ls_elem in answer_contexts]
-            answer_context_dict[answer_id].append(cleaned_answer_contexts)
+            # in order to create batches with the size of 30 and to avoid Memory Errors
+            if len(data_dict) == 30:
+                contexts_counter = 0
+                for line2 in cf:
+                    parsed_answer = json.loads(line2)
+                    # Answer ID should have a corresponding question ID
+                    answer_id = parsed_answer["uid"]
+                    if answer_id in question_id_list:
+                        contexts_counter += 1
+                        # List of contexts with retrieval scores, contexts are sorted from highest to lowest score
+                        answer_contexts = parsed_answer["contexts"]
+                        # remove scores of contexts
+                        cleaned_answer_contexts = [ls_elem[1] for ls_elem in answer_contexts]
+                        data_dict[answer_id].append({"contexts": cleaned_answer_contexts})
+                    if contexts_counter == 30:
+                        break
 
-        question_id_list, context_list, answer_list = add_end_idx(answer_context_dict)
-        encodings = create_encodings(question_id_list, context_list, question_dic)
-        encodings2 = add_token_positions(encodings, answer_list)
+                # add information where answer in context is
+                context_list, answer_list = add_end_idx(data_dict)
+
+                # create the batch-encodings
+                batches_data.append(create_encodings(data_dict, answer_list))
+
+                if len(batches_data) == 3000:
+                    counter += 1
+                    # def save_to_file(path, question_dic, type, set_type, doc_size=None):
+                    save_batch_files("./batch_output", batches_data, counter)
+                    question_id_list.clear()
+                    batches_data.clear()
+                    data_dict.clear()
+
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
         # nested list
@@ -177,7 +189,19 @@ def process_quasar(folder, set_type, doc_size):
 
         # print("Question dic of type <quasar> and set type <{}> has {} entries.".format(set_type, len(question_dic)))
         # return question_dic
-        return encodings2
+        # return encodings2
+
+def save_batch_files(batch_path, batch, counter):
+    file_name = "batch" + args.TYPE + args.SETTYPE + str(counter) + ".pickle"
+
+    # Create the output directory if doesn't exist
+    if not os.path.exists(batch_path):
+        os.makedirs(batch_path)
+
+    # Write to the file
+    with open(batch_path + file_name, "wb") as of:
+        pickle.dump(batch, of)
+    print("pickled file {} and saved it to {}".format(file_name, batch_path + file_name))
 
 
 def save_to_file(path, question_dic, type, set_type, doc_size=None):
