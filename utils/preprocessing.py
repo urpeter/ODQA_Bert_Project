@@ -108,7 +108,9 @@ def process_searchqa(folder, set_type): # TODO: check if data is properly proces
         with open(os.path.join(file_path, filename), "r") as f:
 
             json_data = json.loads(f.read().replace(r" \n", " "))
-            answer_context_dic[json_data["id"]] = {json_data["answer"]:[c["snippet"] for c in json_data["search_results"] if c["snippet"] is not None]}
+            answer_context_dic[json_data["id"]] = {json_data["answer"]:[c["snippet"]
+                                                                        for c in json_data["search_results"]
+                                                                        if c["snippet"] is not None]}
             question_dict[json_data["id"]] = [json_data["question"]]
 
     question_id_list, context_list, answer_list = add_end_idx(answer_context_dic)
