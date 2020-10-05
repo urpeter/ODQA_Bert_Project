@@ -141,9 +141,9 @@ def process_quasar(folder, set_type, doc_size):
             parsed_question = json.loads(line)
             question_id = parsed_question["uid"]
             question_id_list.append(question_id)
-            data_dict[question_id] = [{"answer": parsed_question["answer"]}]
+            data_dict[question_id] = {"answer": parsed_question["answer"]}
             # answer_context_dict[question_id] = [parsed_question["answer"]]
-            data_dict[question_id].append({"question": parsed_question["question"]})
+            data_dict[question_id].update({"question": parsed_question["question"]})
             # question_dic[question_id] = question
 
             # in order to create batches with the size of 30 and to avoid Memory Errors
@@ -159,7 +159,7 @@ def process_quasar(folder, set_type, doc_size):
                         answer_contexts = parsed_answer["contexts"]
                         # remove scores of contexts
                         cleaned_answer_contexts = [ls_elem[1] for ls_elem in answer_contexts]
-                        data_dict[answer_id].append({"contexts": cleaned_answer_contexts})
+                        data_dict[answer_id].update({"contexts": cleaned_answer_contexts})
                     if contexts_counter == 30:
                         break
 
