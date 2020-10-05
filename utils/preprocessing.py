@@ -279,7 +279,7 @@ if __name__ == '__main__':
 
     test_dic = main(type=args.TYPE, folder=args.FOLDERPATH, set_type=args.SETTYPE, doc_size=args.DOCSIZE)
     output_path = Path(os.getcwd() + '/outputs')
-    save_to_file(output_path, test_dic, args.TYPE, args.SETTYPE, args.DOCSIZE)
+    # save_to_file(output_path, test_dic, args.TYPE, args.SETTYPE, args.DOCSIZE)
 
     # Sample call
     # python3 preprocessing.py -t "searchqa" -f /Users/vanessahahn/Documents/QA/searchQA  -s "test"
