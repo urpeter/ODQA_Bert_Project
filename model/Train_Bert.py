@@ -1,6 +1,6 @@
 from pathlib import Path
 from model.ODQA_Dataset import ODQA_Dataset
-from transformers import AutoModelForQuestionAnswering
+from transformers import AutoModelForQuestionAnswering, Trainer, TrainingArguments
 from torch.utils.data import DataLoader
 from transformers import AdamW
 import utils.preprocessing
@@ -25,40 +25,42 @@ def training():
     QUASAR_TEST = Path("/".join([dirpath, 'quasar_test_short.pkl']))
     QUASAR_DEV = Path("/".join([dirpath, 'quasar_dev_short.pkl']))
 
-    # Open Pickled file
-    infile = open(QUASAR_DEV, 'rb')
-    encodings = pickle.load(infile)
-    infile.close()
+    batches = os.listdir("./batch_output")
+    test_set_list = [QUASAR_DEV,QUASAR_TEST,SEARCHQA_TEST,SEARCHQA_VAL]
+
     #Init model
     model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
                                                      return_dict=True)
-    train_dataset = ODQA_Dataset(encodings)
-    val_dataset = ODQA_Dataset(encodings)
-
-    from transformers import DistilBertForSequenceClassification, Trainer, TrainingArguments
-
     training_args = TrainingArguments(
-        output_dir='./output',  # output directory
+        output_dir='./training_output',  # output directory
         num_train_epochs=3,  # total number of training epochs
-        per_device_train_batch_size=16,  # batch size per device during training
-        per_device_eval_batch_size=64,  # batch size for evaluation
+        per_device_train_batch_size=30,  # batch size per device during training
+        per_device_eval_batch_size=30,  # batch size for evaluation
         warmup_steps=500,  # number of warmup steps for learning rate scheduler
         weight_decay=0.01,  # strength of weight decay
         logging_dir='./logs',  # directory for storing logs
         logging_steps=10,
     )
 
-    model = DistilBertForSequenceClassification.from_pretrained("distilbert-base-uncased")
+    for batch in batches:
+        # Open Pickled file
+        infile = open(batch, 'rb')
+        encodings = pickle.load(infile)
+        infile.close()
 
-    trainer = Trainer(
-        model=model,  # the instantiated 🤗 Transformers model to be trained
-        args=training_args,  # training arguments, defined above
-        train_dataset=train_dataset,  # training dataset
-        eval_dataset=val_dataset  # evaluation dataset
-    )
+        train_dataset = ODQA_Dataset(encodings)
+        #val_dataset = ODQA_Dataset(encodings)
 
-    trainer.train()
-    '''device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+        trainer = Trainer(
+            model=model,  # the instantiated 🤗 Transformers model to be trained
+            args=training_args,  # training arguments, defined above
+            train_dataset=train_dataset,  # training dataset
+            #eval_dataset=val_dataset  # evaluation dataset
+        )
+
+        trainer.train()
+
+        '''device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print("Start Training")
     # Train on Dataset
     model.to(device)
@@ -83,13 +85,13 @@ def training():
             optim.step()
 
     #model.eval()'''
-
+        print("Training Done")
     return model
 
-if __name__ == '__main__':
+'''if __name__ == '__main__':
     training()
     print("Training Done")
-    '''parser = ArgumentParser(description='Training script')
+    parser = ArgumentParser(description='Training script')
     parser.add_argument('--out', default='/local/anasbori/outputs', type=str, help='Path to output directory')
 
     # Parse given arguments

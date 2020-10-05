@@ -169,14 +169,16 @@ def process_quasar(folder, set_type, doc_size):
 
                 # create the batch-encodings
                 batches_data.append(create_encodings(data_dict, answer_list))
+                data_dict.clear()
+                question_id_list.clear()
 
                 if len(batches_data) == 3000:
                     counter += 1
                     # def save_to_file(path, question_dic, type, set_type, doc_size=None):
                     save_batch_files("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output/", batches_data, counter)
-                    question_id_list.clear()
+
                     batches_data.clear()
-                    data_dict.clear()
+
 
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
