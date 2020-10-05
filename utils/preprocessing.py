@@ -38,13 +38,10 @@ def add_end_idx(answ_cont_dict):
                 start_idx = index[0][0]
                 end_idx = index[0][1]
 
-            idx_answ_cont_dict[key] = {(answer, start_idx, end_idx): c}
+            idx_answ_cont_dict[key] = (answer, start_idx, end_idx)
 
-        for q_id, value2 in idx_answ_cont_dict.items():
-            for answer, context in value2.items():
-                answers_list.append({'text': answer[0], 'answer_start': answer[1], 'answer_end': answer[2]})
-                # context_list.append(context)
-                # question_id_list.append(q_id)
+        for q_id, answer in idx_answ_cont_dict.items():
+            answers_list.append({'text': answer[0], 'answer_start': answer[1], 'answer_end': answer[2]})
 
     return answers_list
 
@@ -83,6 +80,8 @@ def create_context_and_qustions_lists(data_to_lists_dict):
 
 def create_encodings(data_dict, answer_list):
     context_list, question_list = create_context_and_qustions_lists(data_dict)
+    print("context: " + str(context_list[:10]))
+    print("question: " + str(question_list[:10]))
 
     encodings = tokenizer(context_list, question_list, padding=True, truncation=True)
     add_token_positions(encodings, answer_list)
