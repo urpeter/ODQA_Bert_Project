@@ -17,8 +17,14 @@ def training():
 
     # Input paths
     dirpath = "../outputs"  # args.out
+
+    DATASET_PATH_SEARCHQA = Path("/".join([dirpath, 'searchqa_train.pkl']))
     SEARCHQA_VAL = Path("/".join([dirpath, 'searchqa_val.pkl']))
+    SEARCHQA_TEST = Path("/".join([dirpath, 'searchqa_test.pkl']))
+    DATASET_PATH_QUASAR = Path("/".join([dirpath, 'quasar_train_short.pkl']))
+    QUASAR_TEST = Path("/".join([dirpath, 'quasar_test_short.pkl']))
     QUASAR_DEV = Path("/".join([dirpath, 'quasar_dev_short.pkl']))
+
     # Open Pickled file
     infile = open(QUASAR_DEV, 'rb')
     encodings = pickle.load(infile)
@@ -27,7 +33,7 @@ def training():
     model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
                                                      return_dict=True)
     train_dataset = ODQA_Dataset(encodings)
-    #val_dataset = ODQA_Dataset(encodings)
+    val_dataset = ODQA_Dataset(encodings)
 
     from transformers import DistilBertForSequenceClassification, Trainer, TrainingArguments
 
