@@ -175,7 +175,7 @@ def process_quasar(folder, set_type, doc_size):
                 if len(batches_data) == 3000:
                     counter += 1
                     # def save_to_file(path, question_dic, type, set_type, doc_size=None):
-                    save_batch_files("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output/", batches_data, counter)
+                    save_batch_files(Path("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data, counter)
 
                     batches_data.clear()
 
@@ -195,14 +195,14 @@ def process_quasar(folder, set_type, doc_size):
         # return encodings2
 
 def save_batch_files(batch_path, batch, counter):
-    file_name = "batch" + args.TYPE + args.SETTYPE + str(counter) + ".pickle"
+    file_name = "_".join(["batch", args.TYPE, args.SETTYPE, str(counter)]) + ".pkl"
 
     # Create the output directory if doesn't exist
     if not os.path.exists(batch_path):
         os.makedirs(batch_path)
 
     # Write to the file
-    with open(batch_path + file_name, "wb") as of:
+    with open("/".join([batch_path,file_name]), "wb") as of:
         pickle.dump(batch, of)
     print("pickled file {} and saved it to {}".format(file_name, batch_path + file_name))
 
