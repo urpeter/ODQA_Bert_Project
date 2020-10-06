@@ -203,7 +203,8 @@ def save_batch_files(batch_path, batch, counter):
         os.makedirs(batch_path)
 
     # Write to the file
-    with open(("/".join([batch_path,file_name])), "wb") as of:
+    full_path = Path("/".join([str(batch_path), file_name]))
+    with open(str(full_path), "wb") as of:
         pickle.dump(batch, of)
     print("pickled file {} and saved it to {}".format(file_name, batch_path + file_name))
 
