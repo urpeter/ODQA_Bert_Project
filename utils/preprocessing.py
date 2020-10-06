@@ -172,13 +172,14 @@ def process_quasar(folder, set_type, doc_size):
                 data_dict.clear()
                 question_id_list.clear()
                 print("\n" + str(len(batches_data)))
-                if len(batches_data) == 100:
+                if len(batches_data) == 3000:
                     counter += 1
                     # def save_to_file(path, question_dic, type, set_type, doc_size=None):
                     save_batch_files(Path("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data, counter)
 
                     batches_data.clear()
 
+        save_batch_files(Path("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data, counter)
 
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
@@ -202,7 +203,7 @@ def save_batch_files(batch_path, batch, counter):
         os.makedirs(batch_path)
 
     # Write to the file
-    with open("/".join([batch_path,file_name]), "wb") as of:
+    with open(Path("/".join([batch_path,file_name])), "wb") as of:
         pickle.dump(batch, of)
     print("pickled file {} and saved it to {}".format(file_name, batch_path + file_name))
 
