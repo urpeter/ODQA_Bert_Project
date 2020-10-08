@@ -166,6 +166,7 @@ def process_quasar(folder, set_type, doc_size):
                         cleaned_answer_contexts = [ls_elem[1] for ls_elem in answer_contexts]
                         data_dict[answer_id].update({"contexts": cleaned_answer_contexts})
                     if contexts_counter == 30:
+                        contexts_counter = 0
                         break
 
                 print(contexts_counter)
