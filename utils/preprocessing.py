@@ -197,9 +197,8 @@ def process_quasar(folder, set_type, doc_size):
 
 def save_batch_files(batch_path, batch, counter):
     file_name = str("_".join(["batch", args.TYPE, args.SETTYPE, str(counter)]) + ".pkl")
-    path_type = ""
     # Create the output directory if doesn't exist
-    path_type = "/".join([batch_path, args.SETTYPE])
+    path_type = "/".join([str(batch_path), args.SETTYPE])
 
     if not os.path.exists(path_type):
         os.makedirs(path_type)

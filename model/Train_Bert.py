@@ -16,7 +16,7 @@ wandb.init(project="Bert_ODQA")
 def training():
 
     # Input paths
-    dirpath = "../outputs"  # args.out
+    dirpath = "../batch_output"  # args.out
 
     DATASET_PATH_SEARCHQA = Path("/".join([dirpath, 'searchqa_train.pkl']))
     SEARCHQA_VAL = Path("/".join([dirpath, 'searchqa_val.pkl']))
@@ -25,7 +25,7 @@ def training():
     QUASAR_TEST = Path("/".join([dirpath, 'quasar_test_short.pkl']))
     QUASAR_DEV = Path("/".join([dirpath, 'quasar_dev_short.pkl']))
 
-    batches = os.listdir("./batch_output")
+    batches = os.listdir("./batch_output/train")
     test_set_list = [QUASAR_DEV,QUASAR_TEST,SEARCHQA_TEST,SEARCHQA_VAL]
 
     #Init model
