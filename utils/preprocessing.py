@@ -19,7 +19,7 @@ model = DistilBertForQuestionAnswering.from_pretrained("distilbert-base-uncased"
 
 
 def add_end_idx(answ_cont_dict):
-    print("def add_end_idx(answ_cont_dict) ...")
+    # print("def add_end_idx(answ_cont_dict) ...")
     idx_answ_cont_dict = dict()
 
     context_list = list()
@@ -48,7 +48,7 @@ def add_end_idx(answ_cont_dict):
 
 
 def add_token_positions(encodings, answers):
-    print("def add_token_positions(encodings, answers) ...")
+    # print("def add_token_positions(encodings, answers) ...")
     start_positions = []
     end_positions = []
     for i in range(len(answers)):
@@ -70,7 +70,7 @@ def add_token_positions(encodings, answers):
 
 
 def create_context_and_qustions_lists(data_to_lists_dict):
-    print("def create_context_and_qustions_lists(data_to_lists_dict) ...")
+    # print("def create_context_and_qustions_lists(data_to_lists_dict) ...")
     context_list = list()
     question_list = list()
 
@@ -82,7 +82,7 @@ def create_context_and_qustions_lists(data_to_lists_dict):
 
 
 def create_encodings(data_dict, answer_list):
-    print("def create_encodings(data_dict, answer_list) ...")
+    # print("def create_encodings(data_dict, answer_list) ...")
     context_list, question_list = create_context_and_qustions_lists(data_dict)
     # print("context: " + str(context_list[:10]))
     # print("question: " + str(question_list[:10]))
@@ -169,8 +169,6 @@ def process_quasar(folder, set_type, doc_size):
                         contexts_counter = 0
                         break
 
-                print("context_counter", contexts_counter)
-
                 # add information where answer in context is
                 answer_list = add_end_idx(data_dict)
 
@@ -178,11 +176,12 @@ def process_quasar(folder, set_type, doc_size):
                 batches_data.append(create_encodings(data_dict, answer_list))
                 data_dict.clear()
                 question_id_list.clear()
-                print("\n lenght batches_data" + str(len(batches_data)))
+                print("\n length batches_data " + str(len(batches_data)))
                 if len(batches_data) == 3000:
                     counter += 1
                     # def save_to_file(path, question_dic, type, set_type, doc_size=None):
-                    save_batch_files(("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data, counter)
+                    save_batch_files("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output", batches_data,
+                                     counter)
 
                     batches_data.clear()
 
@@ -206,7 +205,6 @@ def process_quasar(folder, set_type, doc_size):
 def save_batch_files(batch_path, batch, counter):
     print("def save_batch_files(batch_path, batch, counter) ...")
     file_name = str("_".join(["batch", args.TYPE, args.SETTYPE, str(counter)]) + ".pkl")
-    path_type = ""
     # Create the output directory if doesn't exist
     path_type = "/".join([batch_path, args.SETTYPE])
 
