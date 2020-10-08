@@ -179,7 +179,7 @@ def process_quasar(folder, set_type, doc_size):
 
                     batches_data.clear()
 
-        save_batch_files(Path("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data, counter)
+            save_batch_files(Path("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data, counter)
 
 
         # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
