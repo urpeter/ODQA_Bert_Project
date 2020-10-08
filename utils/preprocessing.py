@@ -169,7 +169,7 @@ def process_quasar(folder, set_type, doc_size):
                         contexts_counter = 0
                         break
 
-                print(contexts_counter)
+                print("context_counter", contexts_counter)
 
                 # add information where answer in context is
                 answer_list = add_end_idx(data_dict)
@@ -178,7 +178,7 @@ def process_quasar(folder, set_type, doc_size):
                 batches_data.append(create_encodings(data_dict, answer_list))
                 data_dict.clear()
                 question_id_list.clear()
-                print("\n" + str(len(batches_data)))
+                print("\n lenght batches_data" + str(len(batches_data)))
                 if len(batches_data) == 3000:
                     counter += 1
                     # def save_to_file(path, question_dic, type, set_type, doc_size=None):
