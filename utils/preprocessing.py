@@ -176,7 +176,8 @@ def process_quasar(folder, set_type, doc_size):
                 batches_data.append(create_encodings(data_dict, answer_list))
                 data_dict.clear()
                 question_id_list.clear()
-                print("\n length batches_data " + str(len(batches_data)))
+                if len(batches_data) % 1000 == 0:
+                    print("\n length batches_data " + str(len(batches_data)) + " " + counter)
                 if len(batches_data) == 3000:
                     counter += 1
                     # def save_to_file(path, question_dic, type, set_type, doc_size=None):
