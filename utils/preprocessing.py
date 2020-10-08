@@ -19,6 +19,7 @@ model = DistilBertForQuestionAnswering.from_pretrained("distilbert-base-uncased"
 
 
 def add_end_idx(answ_cont_dict):
+    # print("def add_end_idx(answ_cont_dict) ...")
     idx_answ_cont_dict = dict()
 
     context_list = list()
@@ -47,6 +48,7 @@ def add_end_idx(answ_cont_dict):
 
 
 def add_token_positions(encodings, answers):
+    # print("def add_token_positions(encodings, answers) ...")
     start_positions = []
     end_positions = []
     for i in range(len(answers)):
@@ -68,6 +70,7 @@ def add_token_positions(encodings, answers):
 
 
 def create_context_and_qustions_lists(data_to_lists_dict):
+    # print("def create_context_and_qustions_lists(data_to_lists_dict) ...")
     context_list = list()
     question_list = list()
 
@@ -79,9 +82,10 @@ def create_context_and_qustions_lists(data_to_lists_dict):
 
 
 def create_encodings(data_dict, answer_list):
+    # print("def create_encodings(data_dict, answer_list) ...")
     context_list, question_list = create_context_and_qustions_lists(data_dict)
-    print("context: " + str(context_list[:10]))
-    print("question: " + str(question_list[:10]))
+    # print("context: " + str(context_list[:10]))
+    # print("question: " + str(question_list[:10]))
 
     encodings = tokenizer(context_list, question_list, padding=True, truncation=True)
     add_token_positions(encodings, answer_list)
@@ -89,6 +93,7 @@ def create_encodings(data_dict, answer_list):
 
 
 def process_searchqa(folder, set_type): # TODO: check if data is properly processed !!
+    print("def process_searchqa(folder, set_type) ...")
     answer_context_dic = dict()
     # question_list = []
     question_dict = dict()
@@ -118,6 +123,7 @@ def process_quasar(folder, set_type, doc_size):
     :param doc_size: short or large
     :return:
     """
+    print("def process_quasar(folder, set_type, doc_size) ...")
 
     # create counter for enumeration of batch-files
     counter = 0
@@ -160,9 +166,8 @@ def process_quasar(folder, set_type, doc_size):
                         cleaned_answer_contexts = [ls_elem[1] for ls_elem in answer_contexts]
                         data_dict[answer_id].update({"contexts": cleaned_answer_contexts})
                     if contexts_counter == 30:
+                        contexts_counter = 0
                         break
-
-                print(contexts_counter)
 
                 # add information where answer in context is
                 answer_list = add_end_idx(data_dict)
@@ -171,14 +176,17 @@ def process_quasar(folder, set_type, doc_size):
                 batches_data.append(create_encodings(data_dict, answer_list))
                 data_dict.clear()
                 question_id_list.clear()
-                print("\n" + str(len(batches_data)))
+                # if len(batches_data) % 1000 == 0:
+                print("\n length batches_data " + str(len(batches_data)) + " " + str(counter))
                 if len(batches_data) == 3000:
                     counter += 1
                     # def save_to_file(path, question_dic, type, set_type, doc_size=None):
-                    save_batch_files(("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data, counter)
+                    save_batch_files("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output", batches_data,
+                                     counter)
 
                     batches_data.clear()
 
+        counter += 1
         save_batch_files(Path("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data, counter)
 
 
@@ -196,6 +204,7 @@ def process_quasar(folder, set_type, doc_size):
         # return encodings2
 
 def save_batch_files(batch_path, batch, counter):
+    print("def save_batch_files(batch_path, batch, counter) ...")
     file_name = str("_".join(["batch", args.TYPE, args.SETTYPE, str(counter)]) + ".pkl")
     # Create the output directory if doesn't exist
     path_type = "/".join([str(batch_path), args.SETTYPE])
@@ -220,6 +229,8 @@ def save_to_file(path, question_dic, type, set_type, doc_size=None):
     :param question_dic: mapping of question ids to contexts
     :return:
     """
+    print("def save_to_file(path, question_dic, type, set_type, doc_size=None) ...")
+
     # Check whether question dic contains values
     assert len(question_dic)>0, "question dic is empty"
 
