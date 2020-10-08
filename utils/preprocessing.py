@@ -208,7 +208,7 @@ def save_batch_files(batch_path, batch, counter):
     full_path = Path("/".join([str(path_type), file_name]))
     with open(str(full_path), "wb") as of:
         pickle.dump(batch, of)
-    print("pickled file {} and saved it to {}".format(file_name, str(full_path)))
+    print("pickled file {} and saved it to {}".format(str(file_name), str(full_path)))
 
 
 def save_to_file(path, question_dic, type, set_type, doc_size=None):
