@@ -97,7 +97,7 @@ def process_searchqa(folder, set_type): # TODO: check if data is properly proces
 
     counter = 0
 
-    file_path = Path("/".join([folder, 'train_val_test_json_split', 'data_json', set_type]))
+    file_path = Path("/".join([folder, 'searchqa', set_type]))
 
     for filename in os.listdir(file_path):
         with open(os.path.join(file_path, filename), "r") as f:

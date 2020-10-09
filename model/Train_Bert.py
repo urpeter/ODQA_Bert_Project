@@ -10,9 +10,9 @@ from argparse import ArgumentParser
 import torch
 import pickle
 # Initialize wandb for logging
-import wandb
-wandb.init(project="Bert_ODQA")
-wandb.login(key="06447813c3501a681da170acfe62a6f5aca4cf35")
+#import wandb
+#wandb.init(project="Bert_ODQA")
+#wandb.login(key="06447813c3501a681da170acfe62a6f5aca4cf35")
 
 # Returns the model
 def training():
