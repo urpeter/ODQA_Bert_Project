@@ -178,7 +178,7 @@ def process_quasar(folder, set_type, doc_size):
                 question_id_list.clear()
                 # if len(batches_data) % 1000 == 0:
                 print("\n length batches_data " + str(len(batches_data)) + " " + str(counter))
-                if len(batches_data) == 3000:
+                if len(batches_data) == 1000:
                     counter += 1
                     # def save_to_file(path, question_dic, type, set_type, doc_size=None):
                     save_batch_files("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output", batches_data,
