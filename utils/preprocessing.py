@@ -239,6 +239,7 @@ def process_quasar(folder, set_type, doc_size):
         # return question_dic
         # return encodings2
 
+
 def save_batch_files(batch_path, batch, counter):
     print("def save_batch_files(batch_path, batch, counter) ...")
     file_name = str("_".join(["batch", args.TYPE, args.SETTYPE, str(counter)]) + ".pkl")
