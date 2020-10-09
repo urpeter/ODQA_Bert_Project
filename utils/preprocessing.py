@@ -142,10 +142,13 @@ def process_searchqa(folder, set_type): # TODO: check if data is properly proces
                              counter)
             batches_data.clear()
 
-            # json_data = json.loads(f.read().replace(r" \n", " "))
-            # answer_context_dic[json_data["id"]] = {json_data["answer"]: [c["snippet"]
-                                                                        # for c in json_data["search_results"]
-                                                                        # if c["snippet"] is not None]}
+    counter += 1
+    save_batch_files(Path("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data, counter)
+
+    # json_data = json.loads(f.read().replace(r" \n", " "))
+    # answer_context_dic[json_data["id"]] = {json_data["answer"]: [c["snippet"]
+                                                                # for c in json_data["search_results"]
+                                                                # if c["snippet"] is not None]}
 
     # encodings = create_encodings(question_dict, answer_list)
     # New_encodings = add_token_positions(encodings, answer_list)
