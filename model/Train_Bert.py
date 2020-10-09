@@ -10,9 +10,10 @@ from argparse import ArgumentParser
 import torch
 import pickle
 # Initialize wandb for logging
-#import wandb
-#wandb.init(project="Bert_ODQA")
-#wandb.login(key="06447813c3501a681da170acfe62a6f5aca4cf35")
+import wandb
+wandb.login(key="06447813c3501a681da170acfe62a6f5aca4cf35")
+wandb.init(project="Bert_ODQA")
+
 
 # Returns the model
 def training():
@@ -28,7 +29,7 @@ def training():
     #QUASAR_DEV = Path("/".join([dirpath, 'quasar_dev_short.pkl']))
 
     batches = os.listdir("./batch_output/train")
-    test_set_list = [QUASAR_DEV,QUASAR_TEST,SEARCHQA_TEST,SEARCHQA_VAL]
+    #test_set_list = [QUASAR_DEV,QUASAR_TEST,SEARCHQA_TEST,SEARCHQA_VAL]
 
     #Init model
     model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
