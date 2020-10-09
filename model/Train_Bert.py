@@ -2,6 +2,7 @@ from pathlib import Path
 from model.ODQA_Dataset import ODQA_Dataset
 from transformers import AutoModelForQuestionAnswering, Trainer, TrainingArguments
 from torch.utils.data import DataLoader
+from torch.utils.data import IterableDataset
 from transformers import AdamW
 import utils.preprocessing
 import os
@@ -11,6 +12,7 @@ import pickle
 # Initialize wandb for logging
 import wandb
 wandb.init(project="Bert_ODQA")
+wandb.login(key="06447813c3501a681da170acfe62a6f5aca4cf35")
 
 # Returns the model
 def training():
@@ -18,12 +20,12 @@ def training():
     # Input paths
     dirpath = "../batch_output"  # args.out
 
-    DATASET_PATH_SEARCHQA = Path("/".join([dirpath, 'searchqa_train.pkl']))
-    SEARCHQA_VAL = Path("/".join([dirpath, 'searchqa_val.pkl']))
-    SEARCHQA_TEST = Path("/".join([dirpath, 'searchqa_test.pkl']))
-    DATASET_PATH_QUASAR = Path("/".join([dirpath, 'quasar_train_short.pkl']))
-    QUASAR_TEST = Path("/".join([dirpath, 'quasar_test_short.pkl']))
-    QUASAR_DEV = Path("/".join([dirpath, 'quasar_dev_short.pkl']))
+   # DATASET_PATH_SEARCHQA = Path("/".join([dirpath, 'searchqa_train.pkl']))
+    #SEARCHQA_VAL = Path("/".join([dirpath, 'searchqa_val.pkl']))
+    #SEARCHQA_TEST = Path("/".join([dirpath, 'searchqa_test.pkl']))
+    #DATASET_PATH_QUASAR = Path("/".join([dirpath, 'quasar_train_short.pkl']))
+    #QUASAR_TEST = Path("/".join([dirpath, 'quasar_test_short.pkl']))
+    #QUASAR_DEV = Path("/".join([dirpath, 'quasar_dev_short.pkl']))
 
     batches = os.listdir("./batch_output/train")
     test_set_list = [QUASAR_DEV,QUASAR_TEST,SEARCHQA_TEST,SEARCHQA_VAL]
@@ -41,6 +43,7 @@ def training():
         logging_dir='./logs',  # directory for storing logs
         logging_steps=10,
     )
+
 
     for batch in batches:
         # Open Pickled file
