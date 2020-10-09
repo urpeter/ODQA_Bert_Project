@@ -97,14 +97,14 @@ def process_searchqa(folder, set_type): # TODO: check if data is properly proces
 
     counter = 0
 
+    question_id_list = list()
+    data_dict = dict()
+    batches_data = list()
+
     file_path = Path("/".join([folder, 'searchqa', set_type]))
 
     for filename in os.listdir(file_path):
         with open(os.path.join(file_path, filename), "r") as f:
-
-            question_id_list = list()
-            data_dict = dict()
-            batches_data = list()
 
             for line in f:
                 json_data = json.loads(line.replace(r" \n", " "))
@@ -129,15 +129,18 @@ def process_searchqa(folder, set_type): # TODO: check if data is properly proces
                     # if len(batches_data) % 1000 == 0:
                     print("\n length batches_data " + str(len(batches_data)) + " " + str(counter))
 
-                if len(batches_data) == 3000000:
+                if len(batches_data) == 3000:
                     counter += 1
                     # def save_to_file(path, question_dic, type, set_type, doc_size=None):
                     save_batch_files("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output", batches_data,
                                      counter)
                     batches_data.clear()
 
+        if len(batches_data) == 3000:
             counter += 1
-            save_batch_files(Path("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data, counter)
+            save_batch_files(Path("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data,
+                             counter)
+            batches_data.clear()
 
             # json_data = json.loads(f.read().replace(r" \n", " "))
             # answer_context_dic[json_data["id"]] = {json_data["answer"]: [c["snippet"]
