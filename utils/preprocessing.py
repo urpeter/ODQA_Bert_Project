@@ -94,22 +94,57 @@ def create_encodings(data_dict, answer_list):
 
 def process_searchqa(folder, set_type): # TODO: check if data is properly processed !!
     print("def process_searchqa(folder, set_type) ...")
-    answer_context_dic = dict()
-    # question_list = []
-    question_dict = dict()
+
+    counter = 0
+
     file_path = Path("/".join([folder, 'train_val_test_json_split', 'data_json', set_type]))
 
     for filename in os.listdir(file_path):
         with open(os.path.join(file_path, filename), "r") as f:
 
-            json_data = json.loads(f.read().replace(r" \n", " "))
-            answer_context_dic[json_data["id"]] = {json_data["answer"]:[c["snippet"]
-                                                                        for c in json_data["search_results"]
-                                                                        if c["snippet"] is not None]}
-            question_dict[json_data["id"]] = [json_data["question"]]
+            question_id_list = list()
+            data_dict = dict()
+            batches_data = list()
 
-    answer_list = add_end_idx(answer_context_dic)
-    encodings = create_encodings(question_dict, answer_list)
+            for line in f:
+                json_data = json.loads(line.replace(r" \n", " "))
+                question_id = json_data["id"]
+                question_id_list.append(question_id)
+                data_dict[question_id] = {"answer": json_data["answer"]}
+                data_dict[question_id].update({"question": json_data["question"]})
+
+                # List of contexts with retrieval scores, contexts are sorted from highest to lowest score
+                answer_contexts = [c["snippet"] for c in json_data["search_results"] if c["snippet"] is not None]
+                # remove scores of contexts
+                data_dict[question_id].update({"contexts": answer_contexts})
+
+                if len(data_dict) == 30:
+                    # add information where answer in context is
+                    sqa_answer_list = add_end_idx(data_dict)
+
+                    # create the batch-encodings
+                    batches_data.append(create_encodings(data_dict, sqa_answer_list))
+                    data_dict.clear()
+                    question_id_list.clear()
+                    # if len(batches_data) % 1000 == 0:
+                    print("\n length batches_data " + str(len(batches_data)) + " " + str(counter))
+
+                if len(batches_data) == 3000:
+                    counter += 1
+                    # def save_to_file(path, question_dic, type, set_type, doc_size=None):
+                    save_batch_files("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output", batches_data,
+                                     counter)
+                    batches_data.clear()
+
+            counter += 1
+            save_batch_files(Path("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data, counter)
+
+            # json_data = json.loads(f.read().replace(r" \n", " "))
+            # answer_context_dic[json_data["id"]] = {json_data["answer"]: [c["snippet"]
+                                                                        # for c in json_data["search_results"]
+                                                                        # if c["snippet"] is not None]}
+
+    # encodings = create_encodings(question_dict, answer_list)
     # New_encodings = add_token_positions(encodings, answer_list)
     # return New_encodings
     # TODO: adjust according to quasar !!!
@@ -178,6 +213,7 @@ def process_quasar(folder, set_type, doc_size):
                 question_id_list.clear()
                 # if len(batches_data) % 1000 == 0:
                 print("\n length batches_data " + str(len(batches_data)) + " " + str(counter))
+
                 if len(batches_data) == 3000:
                     counter += 1
                     # def save_to_file(path, question_dic, type, set_type, doc_size=None):
