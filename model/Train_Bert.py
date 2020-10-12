@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 #from pathlib import Path
-from model.ODQA_Dataset import ODQA_Dataset
 from transformers import AutoModelForQuestionAnswering, Trainer, TrainingArguments
 from torch.utils.data import DataLoader
 from torch.utils.data import IterableDataset
@@ -16,8 +15,18 @@ import wandb
 wandb.login(key="06447813c3501a681da170acfe62a6f5aca4cf35")
 wandb.init(project="Bert_ODQA")
 
+class ODQA_Dataset(torch.utils.data.Dataset):
+    def __init__(self, encodings):
+        self.encodings = encodings
 
-# Returns the model
+    def __getitem__(self, idx):
+        return {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
+
+    def __len__(self):
+        return len(self.encodings.input_ids)
+
+
+
 def training():
     # Input paths
     dirpath = "../batch_output"  # args.out
