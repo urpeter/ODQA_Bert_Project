@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from pathlib import Path
 from model.ODQA_Dataset import ODQA_Dataset
 from transformers import AutoModelForQuestionAnswering, Trainer, TrainingArguments
@@ -17,7 +19,6 @@ wandb.init(project="Bert_ODQA")
 
 # Returns the model
 def training():
-    # - *- coding: utf- 8 - *-
     # Input paths
     dirpath = "../batch_output"  # args.out
 
