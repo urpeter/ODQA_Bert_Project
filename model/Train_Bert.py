@@ -2,13 +2,14 @@
 
 #from pathlib import Path
 from transformers import AutoModelForQuestionAnswering, Trainer, TrainingArguments
-from torch.utils.data import DataLoader
-from torch.utils.data import IterableDataset
-from transformers import AdamW
-import utils.preprocessing
-import os
-from argparse import ArgumentParser
 import torch
+from torch.utils.data import DataLoader
+#from torch.utils.data import IterableDataset
+#from transformers import AdamW
+#import utils.preprocessing
+import os
+#from argparse import ArgumentParser
+
 import pickle
 # Initialize wandb for logging
 import wandb
@@ -25,7 +26,6 @@ class ODQA_Dataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.encodings.input_ids)
-
 
 
 def training():
@@ -63,18 +63,18 @@ def training():
             encodings = pickle.load(infile)
         print("Loaded File")
 
-
-        train_dataset = ODQA_Dataset(encodings)
+        for encoding in encodings:
+            train_dataset = ODQA_Dataset(encoding)
         #val_dataset = ODQA_Dataset(encodings)
-        print("Load Trainer")
-        trainer = Trainer(
-            model=model,  # the instantiated 🤗 Transformers model to be trained
-            args=training_args,  # training arguments, defined above
-            train_dataset=train_dataset,  # training dataset
-            #eval_dataset=val_dataset  # evaluation dataset
-        )
-        print("Start Training")
-        trainer.train()
+            print("Load Trainer")
+            trainer = Trainer(
+                model=model,  # the instantiated 🤗 Transformers model to be trained
+                args=training_args,  # training arguments, defined above
+                train_dataset=train_dataset,  # training dataset
+                #eval_dataset=val_dataset  # evaluation dataset
+            )
+            print("Start Training")
+            trainer.train()
 
 
         '''device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
