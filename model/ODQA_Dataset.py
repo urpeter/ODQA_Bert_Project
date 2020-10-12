@@ -1,5 +1,5 @@
+from torch.utils.data import Dataset
 import torch
-
 class ODQA_Dataset(torch.utils.data.Dataset):
     def __init__(self, encodings):
         self.encodings = encodings
