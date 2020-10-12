@@ -13,11 +13,11 @@ import pickle
 import wandb
 wandb.login(key="06447813c3501a681da170acfe62a6f5aca4cf35")
 wandb.init(project="Bert_ODQA")
-# - *- coding: utf- 8 - *-
+
 
 # Returns the model
 def training():
-
+    # - *- coding: utf- 8 - *-
     # Input paths
     dirpath = "../batch_output"  # args.out
 
