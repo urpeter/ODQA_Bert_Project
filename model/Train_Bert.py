@@ -43,7 +43,7 @@ def training():
     #test_set_list = [QUASAR_DEV,QUASAR_TEST,SEARCHQA_TEST,SEARCHQA_VAL]
 
     #Init model
-    model = AutoModelForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad',
+    model = AutoModelForQuestionAnswering.from_pretrained('distilbert-base-uncased',
                                                      return_dict=True)
     training_args = TrainingArguments(
         output_dir='./training_output',  # output directory
@@ -56,23 +56,24 @@ def training():
         logging_steps=10,
     )
 
-
     for batch in batches:
         # Open Pickled file
-        infile = open("/".join(["./batch_output/train",batch]), 'rb')
-        encodings = pickle.load(infile)
-        infile.close()
+        with open("/".join(["./batch_output/train",batch]), 'rb') as infile:
+            print("Loading File")
+            encodings = pickle.load(infile)
+        print("Loaded File")
+
 
         train_dataset = ODQA_Dataset(encodings)
         #val_dataset = ODQA_Dataset(encodings)
-
+        print("Load Trainer")
         trainer = Trainer(
             model=model,  # the instantiated 🤗 Transformers model to be trained
             args=training_args,  # training arguments, defined above
             train_dataset=train_dataset,  # training dataset
             #eval_dataset=val_dataset  # evaluation dataset
         )
-
+        print("Start Training")
         trainer.train()
 
 
