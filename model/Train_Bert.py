@@ -15,6 +15,7 @@ import wandb
 wandb.login(key="06447813c3501a681da170acfe62a6f5aca4cf35")
 wandb.init(project="Bert_ODQA")
 
+
 class ODQA_Dataset(torch.utils.data.Dataset):
     def __init__(self, encodings):
         self.encodings = encodings
@@ -58,7 +59,7 @@ def training():
 
     for batch in batches:
         # Open Pickled file
-        infile = open(batch, 'rb')
+        infile = open("/".join(["./batch_output/train",batch]), 'rb')
         encodings = pickle.load(infile)
         infile.close()
 
@@ -73,6 +74,7 @@ def training():
         )
 
         trainer.train()
+
 
         '''device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print("Start Training")
