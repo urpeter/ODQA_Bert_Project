@@ -64,6 +64,7 @@ def training():
         print("Loaded File")
 
         for encoding in encodings:
+            print(encoding)
             train_dataset = ODQA_Dataset(encoding)
         #val_dataset = ODQA_Dataset(encodings)
             print("Load Trainer")
