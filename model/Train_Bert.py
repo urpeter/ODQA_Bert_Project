@@ -12,9 +12,9 @@ import os
 
 import pickle
 # Initialize wandb for logging
-import wandb
-wandb.login(key="06447813c3501a681da170acfe62a6f5aca4cf35")
-wandb.init(project="Bert_ODQA")
+#import wandb
+#wandb.login(key="06447813c3501a681da170acfe62a6f5aca4cf35")
+#wandb.init(project="Bert_ODQA")
 
 
 class ODQA_Dataset(torch.utils.data.Dataset):
@@ -22,6 +22,8 @@ class ODQA_Dataset(torch.utils.data.Dataset):
         self.encodings = encodings
 
     def __getitem__(self, idx):
+        print(idx)
+        print(self.encodings.items())
         return {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
 
     def __len__(self):
