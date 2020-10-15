@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 #from pathlib import Path
-from
 from transformers import AutoModelForQuestionAnswering, Trainer, TrainingArguments, AdamW
 import torch
 from torch.utils.data import DataLoader
