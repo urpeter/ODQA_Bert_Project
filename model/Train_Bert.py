@@ -23,9 +23,9 @@ class ODQA_Dataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         with open("/local/anasbori/bert_odqa/ODQA_Bert_Project/test_idx.txt", "wb") as of:
-            of.write(idx)
+            of.write(str(idx))
         with open("/local/anasbori/bert_odqa/ODQA_Bert_Project/test_encodings.txt", "wb") as of:
-            of.write(self.encodings2.items())
+            of.write(str(self.encodings2.items()))
         return {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
 
     def __len__(self):
