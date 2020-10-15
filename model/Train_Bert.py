@@ -54,6 +54,38 @@ def training():
             encodings = pickle.load(infile)
         print("Loaded File")
 
+        device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+        print("Start Training")
+        # Train on Dataset
+
+        model.to(device)
+        model.train()
+
+        for encoding in encodings:
+
+            train_dataset = ODQA_Dataset(encoding)
+            train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+
+            optim = AdamW(model.parameters(), lr=5e-5)
+
+            for epoch in range(3):
+                for batch in train_loader:
+                    optim.zero_grad()
+                    input_ids = batch['input_ids'].to(device)
+                    attention_mask = batch['attention_mask'].to(device)
+                    start_positions = batch['start_positions'].to(device)
+                    end_positions = batch['end_positions'].to(device)
+                    outputs = model(input_ids, attention_mask=attention_mask, start_positions=start_positions,
+                                    end_positions=end_positions)
+                    loss = outputs[0]
+                    # wandb.log({'training loss (extraction)': loss})
+                    loss.backward()
+                    optim.step()
+
+            # model.eval()
+            print("Training Batch Done")
+        print("Training for File Done")
+
     '''training_args = TrainingArguments(
         output_dir='./training_output',  # output directory
         num_train_epochs=3,  # total number of training epochs
@@ -81,38 +113,7 @@ def training():
     '''
 
 
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    print("Start Training")
-    # Train on Dataset
 
-    model.to(device)
-    model.train()
-
-    for encoding in encodings:
-
-        train_dataset = ODQA_Dataset(encoding)
-        train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-
-        optim = AdamW(model.parameters(), lr=5e-5)
-
-        for epoch in range(3):
-            for batch in train_loader:
-                optim.zero_grad()
-                input_ids = batch['input_ids'].to(device)
-                attention_mask = batch['attention_mask'].to(device)
-                start_positions = batch['start_positions'].to(device)
-                end_positions = batch['end_positions'].to(device)
-                outputs = model(input_ids, attention_mask=attention_mask, start_positions=start_positions,
-                                end_positions=end_positions)
-                loss = outputs[0]
-                #wandb.log({'training loss (extraction)': loss})
-                loss.backward()
-                optim.step()
-
-        #model.eval()
-        print("Training Batch Done")
-    print("Training Done")
-    return model
 
 '''if __name__ == '__main__':
     training()
