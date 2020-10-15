@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 #from pathlib import Path
-from transformers import AutoModelForQuestionAnswering, Trainer, TrainingArguments
+from
+from transformers import AutoModelForQuestionAnswering, Trainer, TrainingArguments, AdamW
 import torch
 from torch.utils.data import DataLoader
 #from torch.utils.data import IterableDataset
-#from transformers import AdamW
+from transformers import AdamW
 #import utils.preprocessing
 import os
 #from argparse import ArgumentParser
@@ -47,7 +48,14 @@ def training():
     #Init model
     model = AutoModelForQuestionAnswering.from_pretrained('distilbert-base-uncased',
                                                      return_dict=True)
-    training_args = TrainingArguments(
+    for batch in batches:
+        # Open Pickled file
+        with open("/".join(["./batch_output/train", batch]), 'rb') as infile:
+            print("Loading File")
+            encodings = pickle.load(infile)
+        print("Loaded File")
+
+    '''training_args = TrainingArguments(
         output_dir='./training_output',  # output directory
         num_train_epochs=3,  # total number of training epochs
         per_device_train_batch_size=1,  # batch size per device during training
@@ -57,13 +65,6 @@ def training():
         logging_dir='./logs',  # directory for storing logs
         logging_steps=10,
     )
-
-    for batch in batches:
-        # Open Pickled file
-        with open("/".join(["./batch_output/train",batch]), 'rb') as infile:
-            print("Loading File")
-            encodings = pickle.load(infile)
-        print("Loaded File")
 
         for encoding in encodings:
            # print(encoding)
@@ -78,34 +79,40 @@ def training():
             )
             print("Start Training")
             trainer.train()
+    '''
 
 
-        '''device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print("Start Training")
     # Train on Dataset
+
     model.to(device)
     model.train()
 
-    train_loader = DataLoader(train_dataset, batch_size=100, shuffle=True)
+    for encoding in encodings:
 
-    optim = AdamW(model.parameters(), lr=5e-5)
+        train_dataset = ODQA_Dataset(encoding)
+        train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
 
-    for epoch in range(3):
-        for batch in train_loader:
-            optim.zero_grad()
-            input_ids = batch['input_ids'].to(device)
-            attention_mask = batch['attention_mask'].to(device)
-            start_positions = batch['start_positions'].to(device)
-            end_positions = batch['end_positions'].to(device)
-            outputs = model(input_ids, attention_mask=attention_mask, start_positions=start_positions,
-                            end_positions=end_positions)
-            loss = outputs[0]
-            wandb.log({'training loss (extraction)': loss})
-            loss.backward()
-            optim.step()
+        optim = AdamW(model.parameters(), lr=5e-5)
 
-    #model.eval()'''
-        print("Training Done")
+        for epoch in range(3):
+            for batch in train_loader:
+                optim.zero_grad()
+                input_ids = batch['input_ids'].to(device)
+                attention_mask = batch['attention_mask'].to(device)
+                start_positions = batch['start_positions'].to(device)
+                end_positions = batch['end_positions'].to(device)
+                outputs = model(input_ids, attention_mask=attention_mask, start_positions=start_positions,
+                                end_positions=end_positions)
+                loss = outputs[0]
+                #wandb.log({'training loss (extraction)': loss})
+                loss.backward()
+                optim.step()
+
+        #model.eval()
+        print("Training Batch Done")
+    print("Training Done")
     return model
 
 '''if __name__ == '__main__':
