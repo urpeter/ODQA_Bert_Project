@@ -30,7 +30,7 @@ class ODQA_Dataset(torch.utils.data.Dataset):
             print("Key,val length",key,len(val))
         #bla = csv.writer(open("output.csv", "w",encoding="utf-8"),delimiter=';')
         #bla.writerows(self.encodings.items())
-        return {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
+        return {key: torch.tensor(val[idx]) for key, val in self.encodings.items()} #<----------
 
     def __len__(self):
         return len(self.encodings.input_ids)
@@ -70,6 +70,7 @@ def training():
         for encoding in encodings:
 
             train_dataset = ODQA_Dataset(encoding)
+            #train_dataset.__getitem__()
             train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
 
             optim = AdamW(model.parameters(), lr=5e-5)
