@@ -24,6 +24,7 @@ def add_end_idx(answ_cont_dict):
 
     answers_list = list()
 
+    print("answ_cont_dict ", len(answ_cont_dict))
     for key, value in answ_cont_dict.items():
         answer = value["answer"]
         context = value["contexts"]
