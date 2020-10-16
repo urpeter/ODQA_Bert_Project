@@ -32,7 +32,7 @@ def add_end_idx(answ_cont_dict):
             index = [(m.start(0), m.end(0)) for m in re.finditer(re.escape(answer), re.escape(c.lower()))]
 
             if index == []:
-                start_idx = 0
+                start_idx = 1
                 end_idx = 0
             else:
                 start_idx = index[0][0]
