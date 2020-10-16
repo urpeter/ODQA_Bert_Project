@@ -23,7 +23,7 @@ class ODQA_Dataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         print(idx)
-        bla = csv.writer(open("output.csv", "w"))
+        bla = csv.writer(open("output.csv", "w",encoding="utf-8"),delimiter=';')
         bla.writerows(self.encodings.items())
         return {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
 
