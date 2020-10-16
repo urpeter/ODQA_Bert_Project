@@ -40,6 +40,7 @@ def add_end_idx(answ_cont_dict):
 
             idx_answ_cont_dict[key] = (answer, start_idx, end_idx)
 
+        print("idx_anw_cont_dict ", len(idx_answ_cont_dict))
         for q_id, answer in idx_answ_cont_dict.items():
             answers_list.append({'text': answer[0], 'answer_start': answer[1], 'answer_end': answer[2]})
 
@@ -50,8 +51,8 @@ def add_token_positions(encodings, answers):
     # print("def add_token_positions(encodings, answers) ...")
     start_positions = []
     end_positions = []
-    print("encondings: ", len(encodings))
-    print("answers: ", len(answers))
+    # print("encondings: ", len(encodings))
+    # print("answers: ", len(answers))
     for i in range(len(answers)):
         if answers[i]['answer_start'] is None:
             start_positions.append(encodings.char_to_token(i, 0))
@@ -211,8 +212,6 @@ def process_quasar(folder, set_type, doc_size):
                         contexts_counter = 0
                         break
 
-                print("data_dict ", len(data_dict))
-
                 # add information where answer in context is
                 answer_list = add_end_idx(data_dict)
 
@@ -221,7 +220,8 @@ def process_quasar(folder, set_type, doc_size):
                 data_dict.clear()
                 question_id_list.clear()
                 # if len(batches_data) % 1000 == 0:
-                print("\n length batches_data " + str(len(batches_data)) + " " + str(counter))
+
+                # print("\n length batches_data " + str(len(batches_data)) + " " + str(counter))
 
                 if len(batches_data) == 2000:
                     counter += 1
