@@ -24,7 +24,6 @@ def add_end_idx(answ_cont_dict):
 
     answers_list = list()
 
-    print("answ_cont_dict ", len(answ_cont_dict))
     for key, value in answ_cont_dict.items():
         answer = value["answer"]
         context = value["contexts"]
@@ -211,6 +210,8 @@ def process_quasar(folder, set_type, doc_size):
                     if contexts_counter == 30:
                         contexts_counter = 0
                         break
+
+                print("data_dict ", len(data_dict))
 
                 # add information where answer in context is
                 answer_list = add_end_idx(data_dict)
