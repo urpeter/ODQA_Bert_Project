@@ -24,12 +24,15 @@ class ODQA_Dataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         print(idx)
         print("Lange des Encodingdicts",len(self.encodings))
-        blub = ((self.encodings.items())[0])[1]
-        print("lenge von val",len(((self.encodings.items())[0])[1]))
+        blub = (self.encodings.items())
+        print("blub:",blub)
+        for key,val in blub.items():
+            print("Key,val von Blub",key,val)
+        print("lenge von val",len(((self.encodings.items())[0])))
         print("val list elem, mit idx-1",blub[(idx-1)])
 
-        bla = csv.writer(open("output.csv", "w",encoding="utf-8"),delimiter=';')
-        bla.writerows(self.encodings.items())
+        #bla = csv.writer(open("output.csv", "w",encoding="utf-8"),delimiter=';')
+        #bla.writerows(self.encodings.items())
         return {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
 
     def __len__(self):
