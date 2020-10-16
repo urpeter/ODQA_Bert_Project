@@ -52,6 +52,7 @@ def add_token_positions(encodings, answers):
     end_positions = []
     for i in range(len(answers)):
         if answers[i]['answer_start'] is None:
+            print(encodings.char_to_token(i, 0))
             start_positions.append(encodings.char_to_token(i, 0))
             end_positions.append(encodings.char_to_token(i, 0))
             # if None, the answer passage has been truncated
