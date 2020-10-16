@@ -27,10 +27,7 @@ class ODQA_Dataset(torch.utils.data.Dataset):
         blub = (self.encodings.items())
         #print("blub:",blub)
         for key,val in blub:
-            print("Key,val von Blub",key,val)
-        print("lenge von val",len(((self.encodings.items())[0])))
-        print("val list elem, mit idx-1",blub[(idx-1)])
-
+            print("Key,val length",key,len(val))
         #bla = csv.writer(open("output.csv", "w",encoding="utf-8"),delimiter=';')
         #bla.writerows(self.encodings.items())
         return {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
