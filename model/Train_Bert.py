@@ -25,8 +25,8 @@ class ODQA_Dataset(torch.utils.data.Dataset):
         print(idx)
         print("Lange des Encodingdicts",len(self.encodings))
         blub = (self.encodings.items())
-        print("blub:",blub)
-        for key,val in blub.items():
+        #print("blub:",blub)
+        for key,val in blub:
             print("Key,val von Blub",key,val)
         print("lenge von val",len(((self.encodings.items())[0])))
         print("val list elem, mit idx-1",blub[(idx-1)])
