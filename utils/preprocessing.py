@@ -230,7 +230,7 @@ def process_quasar(folder, set_type, doc_size):
                 question_id_list.clear()
                 # if len(batches_data) % 1000 == 0:
 
-                # print("\n length batches_data " + str(len(batches_data)) + " " + str(counter))
+                print("\n length batches_data " + str(len(batches_data)) + " " + str(counter))
 
                 if len(batches_data) == 2000:
                     counter += 1
