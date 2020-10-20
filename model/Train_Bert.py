@@ -40,7 +40,7 @@ def training():
     # Input paths
     dirpath = "../batch_output"  # args.out
 
-   # DATASET_PATH_SEARCHQA = Path("/".join([dirpath, 'searchqa_train.pkl']))
+   #DATASET_PATH_SEARCHQA = Path("/".join([dirpath, 'searchqa_train.pkl']))
     #SEARCHQA_VAL = Path("/".join([dirpath, 'searchqa_val.pkl']))
     #SEARCHQA_TEST = Path("/".join([dirpath, 'searchqa_test.pkl']))
     #DATASET_PATH_QUASAR = Path("/".join([dirpath, 'quasar_train_short.pkl']))
