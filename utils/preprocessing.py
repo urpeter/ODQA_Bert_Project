@@ -23,10 +23,14 @@ def add_end_idx(answ_cont_dict):
     idx_answ_cont_dict = dict()
 
     answers_list = list()
+    questions_list = list()
+    contexts_list = list()
 
     for key, value in answ_cont_dict.items():
         answer = value["answer"]
         context = value["contexts"]
+
+        # context_counter = 0
 
         for c in context:
             index = [(m.start(0), m.end(0)) for m in re.finditer(re.escape(answer), re.escape(c.lower()))]
@@ -38,13 +42,16 @@ def add_end_idx(answ_cont_dict):
                 start_idx = index[0][0]
                 end_idx = index[0][1]
 
-            idx_answ_cont_dict[key] = (answer, start_idx, end_idx)
+            # for every id add information where answer starts in given context
+            # idx_answ_cont_dict[(key, context_counter)] = (answer, start_idx, end_idx)
 
-        print("idx_anw_cont_dict ", len(idx_answ_cont_dict))
-        for q_id, answer in idx_answ_cont_dict.items():
-            answers_list.append({'text': answer[0], 'answer_start': answer[1], 'answer_end': answer[2]})
+        # print("idx_anw_cont_dict ", len(idx_answ_cont_dict))
+        # for q_id, answer in idx_answ_cont_dict.items():
+            answers_list.append({'text': answer, 'answer_start': start_idx, 'answer_end': end_idx})
+            questions_list.append(value["question"])
+            contexts_list.append(c)
 
-    return answers_list
+    return answers_list, questions_list, contexts_list
 
 
 def add_token_positions(encodings, answers):
@@ -71,6 +78,7 @@ def add_token_positions(encodings, answers):
     # return encodings
 
 
+# won't be needed after fixing def add_end_idx()
 def create_context_and_qustions_lists(data_to_lists_dict):
     # print("def create_context_and_qustions_lists(data_to_lists_dict) ...")
     context_list = list()
@@ -83,17 +91,18 @@ def create_context_and_qustions_lists(data_to_lists_dict):
     return context_list, question_list
 
 
-def create_encodings(data_dict, answer_list):
+def create_encodings(answers_list, questions_list, contexts_list):
     # print("def create_encodings(data_dict, answer_list) ...")
-    context_list, question_list = create_context_and_qustions_lists(data_dict)
+    # context_list, question_list = create_context_and_qustions_lists(data_dict)
     # print("context: " + str(context_list[:10]))
     # print("question: " + str(question_list[:10]))
 
-    encodings = tokenizer(context_list, question_list, padding=True, truncation=True)
-    add_token_positions(encodings, answer_list)
+    encodings = tokenizer(contexts_list, questions_list, padding=True, truncation=True)
+    add_token_positions(encodings, answers_list)
     return encodings
 
 
+# TODO adapt !!!
 def process_searchqa(folder, set_type): # TODO: check if data is properly processed !!
     print("def process_searchqa(folder, set_type) ...")
 
@@ -213,10 +222,10 @@ def process_quasar(folder, set_type, doc_size):
                         break
 
                 # add information where answer in context is
-                answer_list = add_end_idx(data_dict)
+                answers_list, questions_list, contexts_list = add_end_idx(data_dict)
 
                 # create the batch-encodings
-                batches_data.append(create_encodings(data_dict, answer_list))
+                batches_data.append(create_encodings(answers_list, questions_list, contexts_list))
                 data_dict.clear()
                 question_id_list.clear()
                 # if len(batches_data) % 1000 == 0:
