@@ -260,10 +260,12 @@ def process_quasar(folder, set_type, doc_size):
 
 def save_batch_files(batch_path, batch, counter):
     print("def save_batch_files(batch_path, batch, counter) ...")
-    #if args.DOCSIZE:
-     #   file_name = str("_".join(["batch", args.TYPE, args.SETTYPE, args.DOCSIZE, str(counter)]) + ".pkl")
-    #else:
-    file_name = str("_".join(["batch", args.TYPE, args.SETTYPE, str(counter)]) + ".pkl")
+
+    if args.TYPE == "quasar" :
+        file_name = str("_".join(["batch", args.TYPE, args.SETTYPE, args.DOCSIZE, str(counter)]) + ".pkl")
+    else:
+        file_name = str("_".join(["batch", args.TYPE, args.SETTYPE, str(counter)]) + ".pkl")
+
     # Create the output directory if doesn't exist
     path_type = "/".join([str(batch_path), args.SETTYPE])
 
