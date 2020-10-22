@@ -131,13 +131,12 @@ def process_searchqa(folder, set_type): # TODO: check if data is properly proces
 
                 if len(data_dict) == 30:
                     # add information where answer in context is
-                    sqa_answer_list = add_end_idx(data_dict)
+                    answers_list, questions_list, contexts_list = add_end_idx(data_dict)
 
                     # create the batch-encodings
-                    batches_data.append(create_encodings(data_dict, sqa_answer_list))
+                    batches_data.append(create_encodings(answers_list, questions_list, contexts_list))
                     data_dict.clear()
                     question_id_list.clear()
-                    # if len(batches_data) % 1000 == 0:
                     print("\n length batches_data " + str(len(batches_data)) + " " + str(counter))
 
                 if len(batches_data) == 2000:
@@ -155,16 +154,6 @@ def process_searchqa(folder, set_type): # TODO: check if data is properly proces
 
     counter += 1
     save_batch_files(Path("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data, counter)
-
-    # json_data = json.loads(f.read().replace(r" \n", " "))
-    # answer_context_dic[json_data["id"]] = {json_data["answer"]: [c["snippet"]
-                                                                # for c in json_data["search_results"]
-                                                                # if c["snippet"] is not None]}
-
-    # encodings = create_encodings(question_dict, answer_list)
-    # New_encodings = add_token_positions(encodings, answer_list)
-    # return New_encodings
-    # TODO: adjust according to quasar !!!
 
 
 def process_quasar(folder, set_type, doc_size):
