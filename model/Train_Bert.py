@@ -51,7 +51,7 @@ def training():
     #trainset_path = os.listdir(Path("./batch_output/train"))
     #devset_path = os.listdir(Path("./batch_output/dev"))
     #valset_path = os.listdir(Path("./batch_output/val"))
-    paths = ["train","val","dev"]
+    paths = ["train","test"]
     for path in paths:
         type_path = "/".join(["./batch_output",path])
         batches[type_path] = (os.listdir(type_path))
