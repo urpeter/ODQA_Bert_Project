@@ -13,9 +13,9 @@ import csv
 import pickle
 from pathlib import Path
 # Initialize wandb for logging
-#import wandb
-#wandb.login(key="06447813c3501a681da170acfe62a6f5aca4cf35")
-#wandb.init(project="Bert_ODQA")
+import wandb
+wandb.login(key="06447813c3501a681da170acfe62a6f5aca4cf35")
+wandb.init(project="Bert_ODQA")
 
 
 class ODQA_Dataset(torch.utils.data.Dataset):
@@ -95,7 +95,7 @@ def training():
                         outputs = model(input_ids, attention_mask=attention_mask, start_positions=start_positions,
                                         end_positions=end_positions)
                         loss = outputs[0]
-                        # wandb.log({'training loss (extraction)': loss})
+                        wandb.log({'training loss (extraction)': loss})
                         loss.backward()
                         optim.step()
 
