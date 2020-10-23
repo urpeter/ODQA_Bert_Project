@@ -42,11 +42,6 @@ def add_end_idx(answ_cont_dict):
                 start_idx = index[0][0]
                 end_idx = index[0][1]
 
-            # for every id add information where answer starts in given context
-            # idx_answ_cont_dict[(key, context_counter)] = (answer, start_idx, end_idx)
-
-        # print("idx_anw_cont_dict ", len(idx_answ_cont_dict))
-        # for q_id, answer in idx_answ_cont_dict.items():
             answers_list.append({'text': answer, 'answer_start': start_idx, 'answer_end': end_idx})
             questions_list.append(value["question"])
             contexts_list.append(c)
@@ -92,11 +87,6 @@ def create_context_and_qustions_lists(data_to_lists_dict):
 
 
 def create_encodings(answers_list, questions_list, contexts_list):
-    # print("def create_encodings(data_dict, answer_list) ...")
-    # context_list, question_list = create_context_and_qustions_lists(data_dict)
-    # print("context: " + str(context_list[:10]))
-    # print("question: " + str(question_list[:10]))
-
     encodings = tokenizer(contexts_list, questions_list, padding=True, truncation=True)
     add_token_positions(encodings, answers_list)
     return encodings
@@ -139,14 +129,14 @@ def process_searchqa(folder, set_type): # TODO: check if data is properly proces
                     question_id_list.clear()
                     print("\n length batches_data " + str(len(batches_data)) + " " + str(counter))
 
-                if len(batches_data) == 2000:
+                if len(batches_data) == 1000:
                     counter += 1
                     # def save_to_file(path, question_dic, type, set_type, doc_size=None):
                     save_batch_files("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output", batches_data,
                                      counter)
                     batches_data.clear()
 
-        if len(batches_data) == 2000:
+        if len(batches_data) == 1000:
             counter += 1
             save_batch_files(Path("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data,
                              counter)
