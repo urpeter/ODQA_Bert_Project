@@ -85,7 +85,7 @@ def training():
 
                 optim = AdamW(model.parameters(), lr=5e-5)
 
-                for epoch in range(3):
+                for epoch in range(2):
                     for batch in train_loader:
                         optim.zero_grad()
                         input_ids = batch['input_ids'].to(device)
@@ -97,7 +97,10 @@ def training():
                         loss = outputs[0]
                         wandb.log({'training loss (extraction)': loss})
                         loss.backward()
+                        wandb.log({'optimization':optim})
                         optim.step()
+
+                wandb.log({"Endcodedfiles":encoding})
 
                 # model.eval()
             print("Training Batch Done")
