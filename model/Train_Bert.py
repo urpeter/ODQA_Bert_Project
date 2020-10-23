@@ -64,7 +64,7 @@ def training():
     for tipe, files in batches.items():
         # Open Pickled file
         for batch in files:
-            # Open Pickled file
+            # Open file from the list of training files e.g. quasar_long_train_1.pkl, searchqa_train_1.pkl
             with open("/".join([tipe, batch]), 'rb') as infile:
                 print("Loading File: " + str(batch))
                 encodings = pickle.load(infile)
@@ -76,7 +76,7 @@ def training():
 
             model.to(device)
             model.train()
-
+            # open list of dataset to train on
             for encoding in encodings:
 
                 train_dataset = ODQA_Dataset(encoding)
