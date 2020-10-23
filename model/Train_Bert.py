@@ -97,7 +97,7 @@ def training():
                         loss = outputs[0]
                         wandb.log({'training loss (extraction)': loss})
                         loss.backward()
-                        wandb.log({'optimization':optim})
+
                         optim.step()
 
                 wandb.log({"Endcodedfiles":encoding})
