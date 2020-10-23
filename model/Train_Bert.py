@@ -71,7 +71,7 @@ def training():
             print("Loaded File")
 
             device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-            print("Start Training")
+            print("Start Training: " + str(batch))
             # Train on Dataset
 
             model.to(device)
