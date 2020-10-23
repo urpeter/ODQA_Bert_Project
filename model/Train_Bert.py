@@ -100,8 +100,6 @@ def training():
 
                         optim.step()
 
-                wandb.log({"Endcodedfiles":encoding})
-
                 # model.eval()
             print("Training Batch Done")
         print("Training for "+str(tipe)+ " Done")
