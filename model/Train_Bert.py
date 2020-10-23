@@ -66,7 +66,7 @@ def training():
         for batch in files:
             # Open Pickled file
             with open("/".join([tipe, batch]), 'rb') as infile:
-                print("Loading File")
+                print("Loading File: " + str(batch))
                 encodings = pickle.load(infile)
             print("Loaded File")
 
@@ -100,7 +100,7 @@ def training():
                         optim.step()
 
                 # model.eval()
-                print("Training Batch Done")
+            print("Training Batch Done")
         print("Training for "+str(tipe)+ " Done")
     print("saving model to file")
     model.save_pretrained("./saved_model")
