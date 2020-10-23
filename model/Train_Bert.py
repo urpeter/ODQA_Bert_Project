@@ -77,6 +77,7 @@ def training():
             model.to(device)
             model.train()
             # open list of dataset to train on
+            counter = 0
             for encoding in encodings:
 
                 train_dataset = ODQA_Dataset(encoding)
@@ -99,7 +100,8 @@ def training():
                         loss.backward()
 
                         optim.step()
-
+                counter +=1
+                print("Encoding-Counter: ",counter)
                 # model.eval()
             print("Training Batch Done")
         print("Training for "+str(tipe)+ " Done")
