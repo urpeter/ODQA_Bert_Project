@@ -20,8 +20,6 @@ class SearchQAInstance:
 
     @classmethod
     def init(cls, processed_line, split, uid=None):
-        cond = True
-
         items = processed_line.split("|||")
         question = items[1].strip()
         answer = items[2].strip()
@@ -50,14 +48,12 @@ class SearchQAInstance:
 
 
 class SearchQA:
-    cond = True
 
     def __init__(self, data_dir, split):
         self.data_dir = data_dir
         self.split = split
 
     def __iter__(self):
-        cond = True
         split_file_path = os.path.join(self.data_dir, self.split + ".txt")
         with open(split_file_path, encoding="utf-8", errors="ignore") as rf:
             uid = 0
@@ -67,11 +63,7 @@ class SearchQA:
                     continue
                 else:
                     inst = SearchQAInstance.init(line, self.split, uid)
-                    if cond:
-                        print(inst)
-                        cond = False
                     # Skip over empty question/contexts
-                    # print(inst.c, inst.q)
                     if not inst.c or not inst.q:
                         continue
                     else:
@@ -87,8 +79,6 @@ class SearchQA:
         assert (isinstance(c, str) and len(c) > 0)
 
     def to_squad(self, version="1.1"):
-        cond = True
-
         # The if version 2.0 is passed, an additional `is_impossible` field will be added
         as_squad = squad_template(version, "SearchQA")
         no_ans = 0
@@ -97,27 +87,25 @@ class SearchQA:
             if self.split == "train":
                 # Original SearchQA paper considers at most 50 contexts and ignore
                 # data points which contain less than 41 contexts for training.
+                print(sqa_instance.id)
                 if sqa_instance.id == 2500:
                     break
                 contexts = sqa_instance.c[:50]
                 if len(contexts) < 41:
                     continue
             else:
-                # print("sqa_instance.c len", len(sqa_instance.c))
                 contexts = sqa_instance.c
 
             for idx, context in enumerate(contexts):
-                # print("context ", context)
                 # Search for answer string in context
                 matches = context.matches
-                # print("matches", matches)
                 if not matches and version != "2.0":
                     continue
                 squad_example = {
                     "qas": [
                         {
                             "question": sqa_instance.q,
-                            # Note how id is assigned, SQAUD_CONTEXTID, so one
+                            # Note how id is assigned, SQAID_CONTEXTID, so one
                             # can aggregate SQuAD like predictions afterwards.
                             "id": "{}_{}".format(sqa_instance.id, idx),
                             "answers": matches
@@ -169,18 +157,9 @@ def search_string(text, string):
 
 
 def convert_searchqa_to_squad(searchqa_dir, output_dir, version):
-    cond = True
-    cond2 = True
-
-    # for split in ("train", "val", "test"):
-    for split in ("val", "test"):
+    for split in ("train", "val", "test"):
         sqa = SearchQA(searchqa_dir, split)
         squad_like_split = sqa.to_squad(version)
-
-        if cond2:
-            # print("squad_like_split: ", squad_like_split)
-            cond2 = False
-
         output_file_path = os.path.join(output_dir, "{}.json".format(split))
         with open(output_file_path, "w", encoding="utf-8", errors="ignore") as wf:
             json.dump(squad_like_split, wf)
@@ -204,7 +183,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--squad_version",
-        default="1.1", type=str,
+        default="2.0", type=str,
         help="Whether to convert as SQuAD version 1.1 or 2.0"
     )
     args = parser.parse_args()
