@@ -20,7 +20,6 @@ model = DistilBertForQuestionAnswering.from_pretrained("distilbert-base-uncased"
 
 def add_end_idx(answ_cont_dict):
     # print("def add_end_idx(answ_cont_dict) ...")
-    idx_answ_cont_dict = dict()
 
     answers_list = list()
     questions_list = list()
@@ -53,8 +52,7 @@ def add_token_positions(encodings, answers):
     # print("def add_token_positions(encodings, answers) ...")
     start_positions = []
     end_positions = []
-    # print("encondings: ", len(encodings))
-    # print("answers: ", len(answers))
+
     for i in range(len(answers)):
         if answers[i]['answer_start'] is None:
             start_positions.append(encodings.char_to_token(i, 0))
@@ -69,21 +67,6 @@ def add_token_positions(encodings, answers):
             if end_positions[-1] is None:
                 end_positions[-1] = tokenizer.model_max_length
     encodings.update({'start_positions': start_positions, 'end_positions': end_positions})
-
-    # return encodings
-
-
-# won't be needed after fixing def add_end_idx()
-def create_context_and_qustions_lists(data_to_lists_dict):
-    # print("def create_context_and_qustions_lists(data_to_lists_dict) ...")
-    context_list = list()
-    question_list = list()
-
-    for q_id, data in data_to_lists_dict.items():
-        context_list.extend(data["contexts"])
-        question_list.extend([data["question"]] * len(data["contexts"]))
-
-    return context_list, question_list
 
 
 def create_encodings(answers_list, questions_list, contexts_list):
@@ -178,9 +161,7 @@ def process_quasar(folder, set_type, doc_size):
             question_id = parsed_question["uid"]
             question_id_list.append(question_id)
             data_dict[question_id] = {"answer": parsed_question["answer"]}
-            # answer_context_dict[question_id] = [parsed_question["answer"]]
             data_dict[question_id].update({"question": parsed_question["question"]})
-            # question_dic[question_id] = question
 
             # in order to create batches with the size of 30 and to avoid Memory Errors
             if len(data_dict) == 30:
@@ -213,7 +194,6 @@ def process_quasar(folder, set_type, doc_size):
 
                 if len(batches_data) == 2000:
                     counter += 1
-                    # def save_to_file(path, question_dic, type, set_type, doc_size=None):
                     save_batch_files("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output", batches_data,
                                      counter)
 
@@ -221,20 +201,6 @@ def process_quasar(folder, set_type, doc_size):
 
         counter += 1
         save_batch_files(Path("/local/anasbori/bert_odqa/ODQA_Bert_Project/batch_output"), batches_data, counter)
-
-
-        # todo: determine whether it is computationally more efficient to save a list of tuples instead of a
-        # nested list
-        # todo: throw an exception if there is no question for a found answer, i.e. the uid is not matching
-        # todo: check if the encoding of the contexts is correct, think I saw a "u355" wrongly encoded piece
-
-        # Check if every question has contexts
-        # for qid, q in question_dic.items():
-        #     assert len(q["contexts"])>0, "Question {} missing context".format(qid)
-
-        # print("Question dic of type <quasar> and set type <{}> has {} entries.".format(set_type, len(question_dic)))
-        # return question_dic
-        # return encodings2
 
 
 def save_batch_files(batch_path, batch, counter):
