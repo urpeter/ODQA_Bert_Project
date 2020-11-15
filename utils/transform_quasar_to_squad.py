@@ -194,7 +194,7 @@ def convert_searchqa_to_squad(quasar_dir_quest, quasar_dir_cont, output_dir, ver
 
     # for split in ("dev", "test"):
     for split in ("train", "dev", "test"):
-    for split in ("train", "dev"):
+    # for split in ("train", "dev"):
         sqa = SearchQA(quasar_dir_quest, quasar_dir_cont, split)
         squad_like_split = sqa.to_squad(version)
 
