@@ -35,15 +35,15 @@ class ODQAModel(BertForQuestionAnswering):
         output_type=QuestionAnsweringModelOutput,
         config_class=_CONFIG_FOR_DOC,
     )
-    def forward(    # TODO set these values
+    def forward(# TODO set these values
         self,
-        input_ids=None,
-        attention_mask=None,
-        token_type_ids=None,
-        position_ids=None,
-        start_positions=None,
-        end_positions=None,
-        return_dict=None,
+        input_ids=[],
+        attention_mask=[],
+        token_type_ids=[],
+        position_ids=[],
+        start_positions=[],
+        end_positions=[],
+        return_dict=[],
     ):
         r"""
         start_positions (:obj:`torch.LongTensor` of shape :obj:`(batch_size,)`, `optional`):
@@ -62,10 +62,6 @@ class ODQAModel(BertForQuestionAnswering):
             attention_mask=attention_mask,
             token_type_ids=token_type_ids,
             position_ids=position_ids,
-            head_mask=head_mask,
-            inputs_embeds=inputs_embeds,
-            output_attentions=output_attentions,
-            output_hidden_states=output_hidden_states,
             return_dict=return_dict,
         )
 
