@@ -46,7 +46,7 @@ from transformers.data.metrics.squad_metrics import (
 )
 from transformers.data.processors.squad import SquadResult, SquadV1Processor, SquadV2Processor
 
-
+from model.ODQA_model import ODQAModel
 try:
     from torch.utils.tensorboard import SummaryWriter
 except ImportError:
@@ -674,7 +674,7 @@ def main():
         # Make sure only the first process in distributed training will download model & vocab
         torch.distributed.barrier()
 
-    args.model_type = args.model_type.lower()
+    args.model_type = args.mode_ltype.lower()
     config = AutoConfig.from_pretrained(
         args.config_name if args.config_name else args.model_name_or_path,
         cache_dir=args.cache_dir if args.cache_dir else None,
@@ -684,7 +684,8 @@ def main():
         do_lower_case=args.do_lower_case,
         cache_dir=args.cache_dir if args.cache_dir else None,
     )
-    model = AutoModelForQuestionAnswering.from_pretrained(
+    #model = AutoModelForQuestionAnswering.from_pretrained( ##TODO ODQA model
+    model = ODQAModel( #TODO ODQA model
         args.model_name_or_path,
         from_tf=bool(".ckpt" in args.model_name_or_path),
         config=config,

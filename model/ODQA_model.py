@@ -9,17 +9,15 @@ from torch import nn
 from torch.nn import CrossEntropyLoss, MSELoss
 from transformers.file_utils import (
     add_code_sample_docstrings,
-    add_start_docstrings_to_model_forward,
-)
+    add_start_docstrings_to_model_forward)
 from transformers.modeling_outputs import (
-    QuestionAnsweringModelOutput,
-)
+    QuestionAnsweringModelOutput)
 from transformers.modeling_bert import BertForQuestionAnswering, BertModel, BERT_INPUTS_DOCSTRING, _CONFIG_FOR_DOC, \
     _TOKENIZER_FOR_DOC
 
 
 class ODQAModel(BertForQuestionAnswering):
-    def __init__(self, config):
+    def __init__(self, cache_dir,config,from_tf):
         super().__init__(config)
         self.num_labels = config.num_labels
 
@@ -43,7 +41,7 @@ class ODQAModel(BertForQuestionAnswering):
         position_ids=[],
         start_positions=[],
         end_positions=[],
-        return_dict=[],
+        return_dict=None,
     ):
         r"""
         start_positions (:obj:`torch.LongTensor` of shape :obj:`(batch_size,)`, `optional`):
