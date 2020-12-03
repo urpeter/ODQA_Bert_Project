@@ -287,6 +287,7 @@ def evaluate(args, model, tokenizer, prefix=""):
                 "token_type_ids": batch[2],
             }
             outputs = model(**inputs)
+            feature_indices = batch[3]
 
         for i, feature_index in enumerate(feature_indices):
             eval_feature = features[feature_index.item()]

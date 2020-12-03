@@ -20,10 +20,8 @@ class ODQAModel(BertForQuestionAnswering):
     def __init__(self, cache_dir,config,from_tf):
         super().__init__(config)
         self.num_labels = config.num_labels
-
         self.bert = BertModel(config, add_pooling_layer=False)
         self.qa_outputs = nn.Linear(config.hidden_size, config.num_labels)
-
         self.init_weights()
 
     @add_start_docstrings_to_model_forward(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
@@ -33,13 +31,13 @@ class ODQAModel(BertForQuestionAnswering):
         output_type=QuestionAnsweringModelOutput,
         config_class=_CONFIG_FOR_DOC,
     )
-    def forward(# TODO set these values
+    def forward_chunk(# changed this function name from forward to forward_chunk
         self,
-        input_ids=[],
-        attention_mask=[],
-        token_type_ids=[],
-        position_ids=[],
-        start_positions=[],
+        input_ids=None,
+        attention_mask=None,
+        token_type_ids=None,
+        position_ids=None,
+        start_positions=None,
         end_positions=[],
         return_dict=None,
     ):
@@ -82,7 +80,7 @@ class ODQAModel(BertForQuestionAnswering):
             start_positions.clamp_(0, ignored_index)
             end_positions.clamp_(0, ignored_index)
 
-            loss_fct = CrossEntropyLoss(ignore_index=ignored_index)
+            loss_fct = CrossEntropyLoss(ignore_index=ignored_index) # TODO Create our own loss function here
             start_loss = loss_fct(start_logits, start_positions)
             end_loss = loss_fct(end_logits, end_positions)
             total_loss = (start_loss + end_loss) / 2
