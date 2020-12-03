@@ -27,7 +27,7 @@ def compute_metrics_from_nbest(searchqa_dir, split, fname_nbest_preds):
         # select best answer from all paragraphs
         ans, _ = sorted(ans, key=lambda x: x[1], reverse=True)[0]
         preds_qid2ans[qid] = ans
-    print(split)
+    print(searchqa_dir,split)
     val_gold = list(SearchQA(searchqa_dir, split))
     gold_qid2ans = dict()
     
