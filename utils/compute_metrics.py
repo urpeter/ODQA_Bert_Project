@@ -8,7 +8,7 @@ from transform_quasar_to_squad import SearchQA
 from transformers.data.metrics.squad_metrics import compute_f1, compute_exact
 
 
-def compute_metrics_from_nbest(searchqa_dir, split, fname_nbest_preds):
+def compute_metrics_from_nbest(question_dir,context_dir, split, fname_nbest_preds):
     qid2preds = collections.defaultdict(list)
     
     with open(fname_nbest_preds) as rf:
@@ -27,8 +27,8 @@ def compute_metrics_from_nbest(searchqa_dir, split, fname_nbest_preds):
         # select best answer from all paragraphs
         ans, _ = sorted(ans, key=lambda x: x[1], reverse=True)[0]
         preds_qid2ans[qid] = ans
-    print(searchqa_dir,split,fname_nbest_preds)
-    val_gold = list(SearchQA(searchqa_dir, split))
+    print(question_dir,context_dir,split,fname_nbest_preds)
+    val_gold = list(SearchQA(question_dir,context_dir, split))
     gold_qid2ans = dict()
     
     for sqa_gold_inst in val_gold:
@@ -58,7 +58,12 @@ if __name__ == "__main__":
     
     ## Required parameters
     parser.add_argument(
-        "--searchqa_dir",
+        "--question_dir",
+        default=None, type=str, required=True,
+        help="SearchQA data directory containing `train.txt`, `val.txt` and `test.txt`."
+    )
+    parser.add_argument(
+        "--context_dir",
         default=None, type=str, required=True,
         help="SearchQA data directory containing `train.txt`, `val.txt` and `test.txt`."
     )
@@ -73,7 +78,7 @@ if __name__ == "__main__":
         help="nbest_predictions_.json path"
     )
     args = parser.parse_args()
-    metrics = compute_metrics_from_nbest(args.searchqa_dir, args.split, args.nbest_predictions)
+    metrics = compute_metrics_from_nbest(args.question_dir,args.context_dir, args.split, args.nbest_predictions)
     print(metrics)
 
 
