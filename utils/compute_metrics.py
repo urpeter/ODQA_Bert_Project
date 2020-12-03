@@ -19,7 +19,7 @@ def compute_metrics_from_nbest(searchqa_dir, split, fname_nbest_preds):
             pred = [p for p in preds[uid] if p["text"]][0]
             #pred = preds[uid][0] # sorted by probs (we are taking best one here)
             ans, score = pred["text"], pred["probability"]
-            qid2preds[int(qid)].append((ans, score))
+            qid2preds[qid].append((ans, score))
     
     preds_qid2ans = dict()
     
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--split", 
         default=None, type=str, required=True,
-        help="Data split."
+        help="Data split. Dev,test or train as string"
     )
     parser.add_argument(
         "--nbest_predictions", 
