@@ -42,6 +42,8 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
             except IndexError:
                 continue
 
+    print(gold_qid2ans.keys())
+
 
     qid2f1 = dict()
     qid2em = dict()
