@@ -57,6 +57,7 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
             qid2f1[qid] = compute_f1(a_gold, a_pred)
             qid2em[qid] = compute_exact(a_gold, a_pred)
         except KeyError:
+            print(qid)
             counter += 1
             continue
 
