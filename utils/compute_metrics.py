@@ -29,6 +29,8 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
         ans, _ = sorted(ans, key=lambda x: x[1], reverse=True)[0]
         preds_qid2ans[qid] = ans
 
+    print(preds_qid2ans.keys())
+
     gold_qid2ans = dict()
 
     quasar_data = os.path.join(quasar_dir, split + "_questions.json")
