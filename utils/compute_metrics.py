@@ -29,7 +29,7 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
         ans, _ = sorted(ans, key=lambda x: x[1], reverse=True)[0]
         preds_qid2ans[qid] = ans
 
-    print(preds_qid2ans.keys())
+    # print(preds_qid2ans.keys())
 
     gold_qid2ans = dict()
 
@@ -40,6 +40,8 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
             gold_qid2ans[p["uid"]] = p["answer"]
 
     # print(gold_qid2ans.keys())
+
+    print(zip(sorted(preds_qid2ans.keys()), sorted(gold_qid2ans.keys())))
 
     qid2f1 = dict()
     qid2em = dict()
