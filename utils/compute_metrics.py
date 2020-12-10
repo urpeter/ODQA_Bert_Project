@@ -43,7 +43,9 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
 
     pred_keys = preds_qid2ans.keys()
     gold_keys = gold_qid2ans.keys()
-    print(zip(sorted(pred_keys), sorted(gold_keys)))
+    print(len(pred_keys), len(gold_keys))
+
+    # print(zip(sorted(pred_keys), sorted(gold_keys)))
 
     qid2f1 = dict()
     qid2em = dict()
