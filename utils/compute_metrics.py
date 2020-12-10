@@ -82,7 +82,7 @@ if __name__ == "__main__":
         help="nbest_predictions_.json path"
     )
     args = parser.parse_args()
-    metrics = compute_metrics_from_nbest(args.searchqa_dir, args.split, args.nbest_predictions)
+    metrics = compute_metrics_from_nbest(args.quasar_dir, args.split, args.nbest_predictions)
     print(metrics)
 
 """
