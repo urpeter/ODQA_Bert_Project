@@ -33,35 +33,18 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
 
     quasar_data = os.path.join(quasar_dir, split + ".json")
     with open(quasar_data) as qa_data:
-        data = json.load(qa_data)
-        data_list = data['data'][0]['paragraphs']
-        for p0 in data_list:
-            # print(p0['qas'][0])
-            try:
-                gold_qid2ans[p0['qas'][0]['id']] = p0['qas'][0]['answers'][0]['text']
-            except IndexError:
-                continue
-
-    # print(gold_qid2ans.keys())
+        for line in qa_data:
+            p = json.loads(line)
+            gold_qid2ans[p["uid"]] = p["answer"]
 
     qid2f1 = dict()
     qid2em = dict()
 
-    counter = 0
-
     for qid in preds_qid2ans.keys():
-        # print(qid)
-        try:
-            a_pred = preds_qid2ans[qid]
-            a_gold = gold_qid2ans[qid]
-            qid2f1[qid] = compute_f1(a_gold, a_pred)
-            qid2em[qid] = compute_exact(a_gold, a_pred)
-        except KeyError:
-            print(qid)
-            counter += 1
-            continue
-
-    print(counter)
+        a_pred = preds_qid2ans[qid]
+        a_gold = gold_qid2ans[qid]
+        qid2f1[qid] = compute_f1(a_gold, a_pred)
+        qid2em[qid] = compute_exact(a_gold, a_pred)
 
     f1 = sum(list(qid2f1.values())) / len(qid2f1)
     f1 *= 100
