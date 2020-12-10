@@ -29,32 +29,20 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
         ans, _ = sorted(ans, key=lambda x: x[1], reverse=True)[0]
         preds_qid2ans[qid] = ans
 
-    # print(preds_qid2ans.keys())
-
     gold_qid2ans = dict()
 
-    # quasar_data = os.path.join(quasar_dir, split + "_questions.json")
-    # with open(quasar_data) as qa_data:
-    #     for line in qa_data:
-    #         p = json.loads(line)
-    #         gold_qid2ans[p["uid"]] = p["answer"]
+    quasar_data = os.path.join(quasar_dir, split + "_questions.json")
 
-    quasar_data = os.path.join(quasar_dir, split + ".json")
     with open(quasar_data) as qa_data:
         data = json.load(qa_data)
-        data_list = data['data'][0]['paragraphs']
+        data_list = qa_data['data'][0]['paragraphs']
         for p0 in data_list:
-            q_id = p0['qas'][0]['id'].split('_')
-            answer = p0['qas'][0]['answers'][0]['text']
-            gold_qid2ans[q_id] = answer
+            try:
+                gold_qid2ans[p0['qas'][0]['id']] = p0['qas'][0]['answers'][0]['text']
+            except IndexError:
+                continue
 
-    # print(gold_qid2ans.keys())
-
-    pred_keys = preds_qid2ans.keys()
-    gold_keys = gold_qid2ans.keys()
-    print(len(pred_keys), len(gold_keys))
-
-    # print(zip(sorted(pred_keys), sorted(gold_keys)))
+    print((len(preds_qid2ans.keys())), len(gold_qid2ans.keys()))
 
     qid2f1 = dict()
     qid2em = dict()
