@@ -60,6 +60,8 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
             counter += 1
             continue
 
+    print(counter)
+
     f1 = sum(list(qid2f1.values())) / len(qid2f1)
     f1 *= 100
     em = sum(list(qid2em.values())) / len(qid2em)
