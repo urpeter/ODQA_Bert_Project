@@ -37,6 +37,8 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
             p = json.loads(line)
             gold_qid2ans[p["uid"]] = p["answer"]
 
+    print(gold_qid2ans.keys())
+
     qid2f1 = dict()
     qid2em = dict()
 
