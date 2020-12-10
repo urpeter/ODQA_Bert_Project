@@ -24,12 +24,12 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
 
     preds_qid2ans = dict()
 
-    print(preds_qid2ans.keys())
-
     for qid, ans in qid2preds.items():
         # select best answer from all paragraphs
         ans, _ = sorted(ans, key=lambda x: x[1], reverse=True)[0]
         preds_qid2ans[qid] = ans
+
+    print(preds_qid2ans.keys())
 
     gold_qid2ans = dict()
 
