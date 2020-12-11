@@ -33,21 +33,24 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
 
     quasar_data = os.path.join(quasar_dir, split + "_questions.json")
 
-    with open(quasar_data, 'r') as qa_data:
-        pred_keys = preds_qid2ans.keys()
-        for line in qa_data:
-            data = json.loads(line)
-            if gold_qid2ans[data['uid']] in pred_keys:
-                gold_qid2ans[data['uid']] = data['answer']
+    # with open(quasar_data, 'r') as qa_data:
+    #     pred_keys = preds_qid2ans.keys()
+    #     for line in qa_data:
+    #         data = json.loads(line)
+    #         if gold_qid2ans[data['uid']] in pred_keys:
+    #             gold_qid2ans[data['uid']] = data['answer']
 
-    # with open(quasar_data) as qa_data:
-    #     data = json.load(qa_data)
-    #     data_list = data['data'][0]['paragraphs']
-    #     for p0 in data_list:
-    #         try:
-    #             gold_qid2ans[p0['qas'][0]['id']] = p0['qas'][0]['answers'][0]['text']
-    #         except IndexError:
-    #             continue
+    with open(quasar_data) as qa_data:
+        data = json.load(qa_data)
+        data_list = data['data'][0]['paragraphs']
+        pred_keys = preds_qid2ans.keys()
+        print(pred_keys)
+        for p0 in data_list:
+            try:
+                if p0['qas'][0]['id'] in pred_keys:
+                    gold_qid2ans[p0['qas'][0]['id']] = p0['qas'][0]['answers'][0]['text']
+            except IndexError:
+                continue
 
     print((len(preds_qid2ans.keys())), len(gold_qid2ans.keys()))
 
