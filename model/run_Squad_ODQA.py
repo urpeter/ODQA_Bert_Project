@@ -75,13 +75,18 @@ def train(args, train_dataset, model, tokenizer):
     """ Train the model """
     if args.local_rank in [-1, 0]:
         tb_writer = SummaryWriter()
+    def collate_minibatch(data): # pad with this to length 41
+        return torch.tensor()
+#TODO  take three batches and pass them to forward in line 183 and pick the best
+# collate right call? Does it only take the 16 datapoints as input or the next tuple in the dataset ?
 
-#TODO Idea: remove train_sampler and then set a loop to take three batches and
-# pass them to forward in line 183 and pick highest with compute metrics
+
+    for question in train_dataset:
+
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
-    #train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset)
-    # Set batch_size to 8 and take 4 minibatches
-    train_dataloader = DataLoader(train_dataset, batch_size=args.train_batch_size)#sampler=train_sampler, args.train_batch_size)
+    train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset)
+    # Set batch_size to 16 and make 3 minibatches out of each tuple in dataset
+    train_dataloader = DataLoader(train_dataset,collate_fn=collate_minibatch, sampler= train_sampler,batch_size=args.train_batch_size)
 
     if args.max_steps > 0:
         t_total = args.max_steps
@@ -201,9 +206,10 @@ def train(args, train_dataset, model, tokenizer):
                 output = model(**inputs)
                 outputs.append(output)
 
-
+            #TODO implement a function or logic to acquire best possible output, now based on lowest loss
+            loss = min(outputs,key=lambda x: x[0])[0]
             # model outputs are always tuple in transformers (see doc)
-            loss = output[0]
+            #loss = output[0]
             # Maybe I should take the one with the lowest loss here and pass it above that could be an Idea
             if args.n_gpu > 1:
                 loss = loss.mean()  # mean() to average on multi-gpu parallel (not distributed) training
