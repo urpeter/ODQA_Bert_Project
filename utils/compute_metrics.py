@@ -50,8 +50,8 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
         print(pred_keys)
         for p0 in data_list:
             try:
-                if p0['qas'][0]['id'] in pred_keys:
-                    gold_qid2ans[p0['qas'][0]['id']] = p0['qas'][0]['answers'][0]['text']
+                # if p0['qas'][0]['id'] in pred_keys:
+                gold_qid2ans[p0['qas'][0]['id']] = p0['qas'][0]['answers'][0]['text']
             except IndexError:
                 continue
 
