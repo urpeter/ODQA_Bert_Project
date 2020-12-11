@@ -31,14 +31,14 @@ class ODQAModel(BertForQuestionAnswering):
         output_type=QuestionAnsweringModelOutput,
         config_class=_CONFIG_FOR_DOC,
     )
-    def forward_chunk(# changed this function name from forward to forward_chunk
+    def forward(# changed this function name from forward to forward_chunk
         self,
         input_ids=None,
         attention_mask=None,
         token_type_ids=None,
         position_ids=None,
         start_positions=None,
-        end_positions=[],
+        end_positions=None,
         return_dict=None,
     ):
         r"""

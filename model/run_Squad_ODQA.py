@@ -76,9 +76,12 @@ def train(args, train_dataset, model, tokenizer):
     if args.local_rank in [-1, 0]:
         tb_writer = SummaryWriter()
 
+#TODO Idea: remove train_sampler and then set a loop to take three batches and
+# pass them to forward in line 183 and pick highest with compute metrics
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
-    train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset)
-    train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.train_batch_size)
+    #train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset)
+    # Set batch_size to 8 and take 4 minibatches
+    train_dataloader = DataLoader(train_dataset, batch_size=args.train_batch_size)#sampler=train_sampler, args.train_batch_size)
 
     if args.max_steps > 0:
         t_total = args.max_steps
@@ -169,7 +172,14 @@ def train(args, train_dataset, model, tokenizer):
 
     for _ in train_iterator:
         epoch_iterator = tqdm(train_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
-        for step, batch in enumerate(epoch_iterator):
+
+        def remove3(lis):
+            return_list = []
+            for i in range(3):
+                return_list.append(next(lis))
+            return return_list
+        four_batches_list = remove3(epoch_iterator)
+        for step, batches in enumerate(four_batches_list):
 
             # Skip past any already trained steps if resuming training
             if steps_trained_in_current_epoch > 0:
@@ -177,19 +187,24 @@ def train(args, train_dataset, model, tokenizer):
                 continue
 
             model.train()
-            batch = tuple(t.to(args.device) for t in batch)
+            outputs = []
+            for batch in batches:
+                batch = tuple(t.to(args.device) for t in batch)
 
-            inputs = {
-                "input_ids": batch[0],
-                "attention_mask": batch[1],
-                "token_type_ids": batch[2],
-                "start_positions": batch[3],
-                "end_positions": batch[4],
-            }
-            outputs = model(**inputs)
+                inputs = {
+                    "input_ids": batch[0],
+                    "attention_mask": batch[1],
+                    "token_type_ids": batch[2],
+                    "start_positions": batch[3],
+                    "end_positions": batch[4],
+                }
+                output = model(**inputs)
+                outputs.append(output)
+
+
             # model outputs are always tuple in transformers (see doc)
-            loss = outputs[0]
-
+            loss = output[0]
+            # Maybe I should take the one with the lowest loss here and pass it above that could be an Idea
             if args.n_gpu > 1:
                 loss = loss.mean()  # mean() to average on multi-gpu parallel (not distributed) training
             if args.gradient_accumulation_steps > 1:
@@ -202,6 +217,7 @@ def train(args, train_dataset, model, tokenizer):
                 loss.backward()
 
             tr_loss += loss.item()
+
             if (step + 1) % args.gradient_accumulation_steps == 0:
                 if args.fp16:
                     torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), args.max_grad_norm)
@@ -214,30 +230,30 @@ def train(args, train_dataset, model, tokenizer):
                 global_step += 1
 
                 # Log metrics
-                if args.local_rank in [-1, 0] and args.logging_steps > 0 and global_step % args.logging_steps == 0:
-                    # Only evaluate when single GPU otherwise metrics may not average well
-                    if args.local_rank == -1 and args.evaluate_during_training:
-                        results = evaluate(args, model, tokenizer)
-                        for key, value in results.items():
-                            tb_writer.add_scalar("eval_{}".format(key), value, global_step)
-                    tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
-                    tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
-                    logging_loss = tr_loss
+            if args.local_rank in [-1, 0] and args.logging_steps > 0 and global_step % args.logging_steps == 0:
+                # Only evaluate when single GPU otherwise metrics may not average well
+                if args.local_rank == -1 and args.evaluate_during_training:
+                    results = evaluate(args, model, tokenizer)
+                    for key, value in results.items():
+                        tb_writer.add_scalar("eval_{}".format(key), value, global_step)
+                tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
+                tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
+                logging_loss = tr_loss
 
-                # Save model checkpoint
-                if args.local_rank in [-1, 0] and args.save_steps > 0 and global_step % args.save_steps == 0:
-                    output_dir = os.path.join(args.output_dir, "checkpoint-{}".format(global_step))
-                    # Take care of distributed/parallel training
-                    model_to_save = model.module if hasattr(model, "module") else model
-                    model_to_save.save_pretrained(output_dir)
-                    tokenizer.save_pretrained(output_dir)
+            # Save model checkpoint
+            if args.local_rank in [-1, 0] and args.save_steps > 0 and global_step % args.save_steps == 0:
+                output_dir = os.path.join(args.output_dir, "checkpoint-{}".format(global_step))
+                # Take care of distributed/parallel training
+                model_to_save = model.module if hasattr(model, "module") else model
+                model_to_save.save_pretrained(output_dir)
+                tokenizer.save_pretrained(output_dir)
 
-                    torch.save(args, os.path.join(output_dir, "training_args.bin"))
-                    logger.info("Saving model checkpoint to %s", output_dir)
+                torch.save(args, os.path.join(output_dir, "training_args.bin"))
+                logger.info("Saving model checkpoint to %s", output_dir)
 
-                    torch.save(optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
-                    torch.save(scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
-                    logger.info("Saving optimizer and scheduler states to %s", output_dir)
+                torch.save(optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
+                torch.save(scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
+                logger.info("Saving optimizer and scheduler states to %s", output_dir)
 
             if args.max_steps > 0 and global_step > args.max_steps:
                 epoch_iterator.close()
@@ -714,6 +730,7 @@ def main():
 
     # Training
     if args.do_train:
+        #TODO here run for loop for each question in train.json
         train_dataset = load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=False)
         global_step, tr_loss = train(args, train_dataset, model, tokenizer)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
@@ -735,6 +752,8 @@ def main():
         model = AutoModelForQuestionAnswering.from_pretrained(args.output_dir)  # , force_download=True)
         tokenizer = AutoTokenizer.from_pretrained(args.output_dir, do_lower_case=args.do_lower_case)
         model.to(args.device)
+
+    # Not for now
 
     # Evaluation - we can ask to evaluate all the checkpoints (sub-directories) in a directory
     results = {}
