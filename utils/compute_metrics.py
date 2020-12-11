@@ -15,9 +15,9 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
     with open(fname_nbest_preds) as rf:
         preds = json.load(rf)
         for uid in preds:
-            print(uid)
+            # print(uid)
             qid, idx = uid.split("_")
-            print(qid)
+            # print(qid)
             # Take only non-empty predictions
             # pred = [p for p in preds[uid] if p["text"]][0]
             pred = preds[uid][0]  # sorted by probs (we are taking best one here)
