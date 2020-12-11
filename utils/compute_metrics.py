@@ -31,7 +31,7 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
 
     gold_qid2ans = dict()
 
-    quasar_data = os.path.join(quasar_dir, split + "_questions.json")
+    quasar_data = os.path.join(quasar_dir, split + ".json")
 
     with open(quasar_data, 'r') as qa_data:
         for line in qa_data:
