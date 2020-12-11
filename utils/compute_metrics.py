@@ -40,10 +40,10 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
         pred_keys = preds_qid2ans.keys()
         for line in qa_data:
             data = json.loads(line)
-            if gold_qid2ans[data['uid']] in pred_keys:
-                gold_qid2ans[data['uid']] = data['answer']
-            else:
-                continue
+            # if gold_qid2ans[data['uid']] in pred_keys:
+            gold_qid2ans[data['uid']] = data['answer']
+            # else:
+            #     continue
 
     # with open(quasar_data) as qa_data:
     #     data = json.load(qa_data)
