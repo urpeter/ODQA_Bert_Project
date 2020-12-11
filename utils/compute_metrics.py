@@ -31,6 +31,8 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
         ans, _ = sorted(ans, key=lambda x: x[1], reverse=True)[0]
         preds_qid2ans[qid] = ans
 
+    print(preds_qid2ans)
+
     gold_qid2ans = dict()
 
     quasar_data = os.path.join(quasar_dir, split + "_questions.json")
@@ -63,7 +65,7 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
         try:
             a_pred = preds_qid2ans[qid]
             a_gold = gold_qid2ans[qid]
-            print('pred: ', a_pred, 'gold: ', a_gold)
+            # print('pred: ', a_pred, 'gold: ', a_gold)
             qid2f1[qid] = compute_f1(a_gold, a_pred)
             qid2em[qid] = compute_exact(a_gold, a_pred)
         except KeyError:
