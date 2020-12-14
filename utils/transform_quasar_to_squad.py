@@ -230,5 +230,5 @@ if __name__ == "__main__":
         help="Whether to convert as SQuAD version 1.1 or 2.0"
     )
     args = parser.parse_args()
-    os.makedirs(args.output_dir, exist_ok=True)
+    # os.makedirs(args.output_dir, exist_ok=True)
     convert_searchqa_to_squad(args.quasar_dir_quest, args.quasar_dir_cont, args.output_dir, args.squad_version)
