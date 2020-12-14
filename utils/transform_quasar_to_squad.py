@@ -122,8 +122,10 @@ class SearchQA:
                     break
                 # Original SearchQA paper considers at most 50 contexts and ignore
                 # data points which contain less than 41 contexts for training.
-                contexts = sqa_instance.c[:50]
-                if len(contexts) < 41:
+                # contexts = sqa_instance.c[:50]
+                # if len(contexts) < 41:
+                contexts = sqa_instance.c[:40]
+                if len(contexts) < 40:
                     continue
             else:
                 contexts = sqa_instance.c
