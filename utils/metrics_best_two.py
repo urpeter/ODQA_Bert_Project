@@ -58,7 +58,6 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
         pred_vals = preds_qid2ans.values()
     #     print(pred_keys)
         for p0 in data_list:
-            print(data_list.index(p0))
             if p0['qas'][0]['id'] not in pred_vals:
                 data_list.pop(data_list.index(p0))
         print(len(data_list))
