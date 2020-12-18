@@ -63,7 +63,7 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
             if p0['qas'][0]['id'] in pred_vals:
                 new_data_list.append(p0)
         print(len(new_data_list))
-        as_squad["data"][0]["paragraphs"].append(new_data_list)
+        as_squad["data"][0]["paragraphs"].extend(new_data_list)
 
     return as_squad
 
