@@ -52,6 +52,7 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
     #         gold_qid2ans[data['uid']] = data['answer']
 
     with open(quasar_data) as qa_data:
+        as_squad = squad_template()
         data = json.load(qa_data)
         data_list = data['data'][0]['paragraphs']
         print(len(data_list))
@@ -62,6 +63,28 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
             if p0['qas'][0]['id'] in pred_vals:
                 new_data_list.append(p0)
         print(len(new_data_list))
+        as_squad["data"][0]["paragraphs"].append(new_data_list)
+
+    return as_squad
+
+
+def create_new_train_file(squad_like_split, output_dir, split):
+    output_file_path = os.path.join(output_dir, "{}.json".format(split))
+    with open(output_file_path, "w", encoding="utf-8", errors="ignore") as wf:
+        json.dump(squad_like_split, wf)
+
+
+def squad_template(version="2.0", title="quasar-t"):
+    template = {
+        "version": version,
+        "data": [
+            {
+                "title": title,
+                "paragraphs": []
+            }
+        ]
+    }
+    return template
 
     #         try:
     #             # if p0['qas'][0]['id'] in pred_keys:
@@ -119,14 +142,16 @@ if __name__ == "__main__":
         default=None, type=str, required=True,
         help="nbest_predictions_.json path"
     )
+    parser.add_argument(
+        "--out_dir",
+        default=None, type=str, required=True,
+        help="output path for new dataset"
+    )
     args = parser.parse_args()
     # metrics = compute_metrics_from_nbest(args.quasar_dir, args.split, args.nbest_predictions)
-    compute_metrics_from_nbest(args.quasar_dir, args.split, args.nbest_predictions)
+    new_squad = compute_metrics_from_nbest(args.quasar_dir, args.split, args.nbest_predictions)
+    create_new_train_file(new_squad, args.out_dir, args.split)
     # print(metrics)
-
-
-def create_new_train_file():
-    pass
 
 
 """
