@@ -28,8 +28,11 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
 
     for qid, ans in qid2preds.items():
         # select best answer from all paragraphs
-        print(sorted(ans, key=lambda x: x[1], reverse=True))
-        print(sorted(ans, key=lambda x: x[1], reverse=True)[0])
+        # print(sorted(ans, key=lambda x: x[1], reverse=True))
+        # print(sorted(ans, key=lambda x: x[1], reverse=True)[0])
+        sorted_list = sorted(ans, key=lambda x: x[1], reverse=True)
+        print(sorted_list[0])
+        print(sorted_list[1])
         ans, _, idx = sorted(ans, key=lambda x: x[1], reverse=True)[0]
         ans2, _2, idx2 = sorted(ans, key=lambda x: x[1], reverse=True)[1]
         preds_qid2ans[qid] = (idx, idx2)
