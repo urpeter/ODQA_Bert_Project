@@ -56,7 +56,7 @@ def compute_metrics_from_nbest(quasar_dir, split, fname_nbest_preds):
         data_list = data['data'][0]['paragraphs']
         print(len(data_list))
         new_data_list = list()
-        pred_vals = preds_qid2ans.values()
+        pred_vals = list(sum(preds_qid2ans.values(), ()))
         print(pred_vals)
         for p0 in data_list:
             if p0['qas'][0]['id'] in pred_vals:
