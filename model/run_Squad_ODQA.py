@@ -47,6 +47,7 @@ from transformers.data.metrics.squad_metrics import (
 from transformers.data.processors.squad import SquadResult, SquadV1Processor, SquadV2Processor
 
 from model.ODQA_model import ODQAModel
+from utils.ODQA_processor import OdqaProcessor
 try:
     from torch.utils.tensorboard import SummaryWriter
 except ImportError:
@@ -75,8 +76,6 @@ def train(args, train_dataset, model, tokenizer):
     """ Train the model """
     if args.local_rank in [-1, 0]:
         tb_writer = SummaryWriter()
-
-    for question in train_dataset:
 
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
     train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset)
@@ -173,13 +172,7 @@ def train(args, train_dataset, model, tokenizer):
     for _ in train_iterator:
         epoch_iterator = tqdm(train_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
 
-        def remove3(lis):
-            return_list = []
-            for i in range(3):
-                return_list.append(next(lis))
-            return return_list
-        four_batches_list = remove3(epoch_iterator)
-        for step, batches in enumerate(four_batches_list):
+        for step, batch in enumerate(epoch_iterator):
 
             # Skip past any already trained steps if resuming training
             if steps_trained_in_current_epoch > 0:
@@ -188,24 +181,23 @@ def train(args, train_dataset, model, tokenizer):
 
             model.train()
             outputs = []
-            for batch in batches:
-                batch = tuple(t.to(args.device) for t in batch)
 
-                inputs = {
-                    "input_ids": batch[0],
-                    "attention_mask": batch[1],
-                    "token_type_ids": batch[2],
-                    "start_positions": batch[3],
-                    "end_positions": batch[4],
-                }
-                output = model(**inputs)
-                outputs.append(output)
+            batch = tuple(t.to(args.device) for t in batch)
 
+            inputs = {
+                "input_ids": batch[0],
+                "attention_mask": batch[1],
+                "token_type_ids": batch[2],
+                "start_positions": batch[3],
+                "end_positions": batch[4],
+            }
+            output = model(**inputs)
+            outputs.append(output)
 
-            loss = min(outputs,key=lambda x: x[0])[0]
+            #loss = min(outputs,key=lambda x: x[0])[0]
             # model outputs are always tuple in transformers (see doc)
-            #loss = output[0]
-            # Maybe I should take the one with the lowest loss here and pass it above that could be an Idea
+            loss = output[0]
+
             if args.n_gpu > 1:
                 loss = loss.mean()  # mean() to average on multi-gpu parallel (not distributed) training
             if args.gradient_accumulation_steps > 1:
@@ -410,34 +402,34 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=Fal
             tfds_examples = tfds.load("squad")
             examples = SquadV1Processor().get_examples_from_dataset(tfds_examples, evaluate=evaluate)
         else:
-            processor = SquadV2Processor() if args.version_2_with_negative else SquadV1Processor()
+            processor = OdqaProcessor() if args.version_2_with_negative else SquadV1Processor()
             if evaluate:
                 examples = processor.get_dev_examples(args.data_dir, filename=args.predict_file)
             else:
                 examples = processor.get_train_examples(args.data_dir, filename=args.train_file)
 
-        features, dataset = squad_convert_examples_to_features(
-            examples=examples,
-            tokenizer=tokenizer,
-            max_seq_length=args.max_seq_length,
-            doc_stride=args.doc_stride,
-            max_query_length=args.max_query_length,
-            is_training=not evaluate,
-            return_dataset="pt",
-            threads=args.threads,
-        )
-
-        if args.local_rank in [-1, 0]:
-            logger.info("Saving features into cached file %s", cached_features_file)
-            torch.save({"features": features, "dataset": dataset, "examples": examples}, cached_features_file)
+        dataset_list = []
+        for example in examples.values():
+            features, dataset= squad_convert_examples_to_features(
+                examples=example,
+                tokenizer=tokenizer,
+                max_seq_length=args.max_seq_length,
+                doc_stride=args.doc_stride,
+                max_query_length=args.max_query_length,
+                is_training=not evaluate,
+                return_dataset="pt",
+                threads=args.threads,
+            )
+            if args.local_rank in [-1, 0]:
+                logger.info("Saving features into cached file %s", cached_features_file)
+                torch.save({"features": features, "dataset": dataset, "examples": example}, cached_features_file)
+            dataset_list.append(dataset)
 
     if args.local_rank == 0 and not evaluate:
         # Make sure only the first process in distributed training process the dataset, and the others will use the cache
         torch.distributed.barrier()
 
-    if output_examples:
-        return dataset, examples, features
-    return dataset
+    return dataset_list
 
 
 def main():
@@ -571,7 +563,7 @@ def main():
     parser.add_argument("--warmup_steps", default=0, type=int, help="Linear warmup over warmup_steps.")
     parser.add_argument(
         "--n_best_size",
-        default=20,
+        default=2,
         type=int,
         help="The total number of n-best predictions to generate in the nbest_predictions.json output file.",
     )

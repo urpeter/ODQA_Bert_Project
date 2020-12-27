@@ -1,8 +1,9 @@
 from transformers.data.processors import squad
 from tqdm import tqdm
 
-class OdqaProcessor(squad.SquadProcessor):
-
+class OdqaProcessor(squad.SquadV2Processor):
+    # Creates a dict of example lists per question.
+    # Each key is a question with a list of the examples corresponding to the question as the value
     def _create_examples(self, input_data, set_type):
         is_training = set_type == "train"
         examples_dict = {}
