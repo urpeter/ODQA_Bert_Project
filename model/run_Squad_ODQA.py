@@ -75,18 +75,13 @@ def train(args, train_dataset, model, tokenizer):
     """ Train the model """
     if args.local_rank in [-1, 0]:
         tb_writer = SummaryWriter()
-    def collate_minibatch(data): # pad with this to length 41
-        return torch.tensor()
-#TODO  take three batches and pass them to forward in line 183 and pick the best
-# collate right call? Does it only take the 16 datapoints as input or the next tuple in the dataset ?
-
 
     for question in train_dataset:
 
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
     train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset)
-    # Set batch_size to 16 and make 3 minibatches out of each tuple in dataset
-    train_dataloader = DataLoader(train_dataset,collate_fn=collate_minibatch, sampler= train_sampler,batch_size=args.train_batch_size)
+    # Set batch_size to 8
+    train_dataloader = DataLoader(train_dataset, sampler= train_sampler,batch_size=args.train_batch_size)
 
     if args.max_steps > 0:
         t_total = args.max_steps
@@ -206,7 +201,7 @@ def train(args, train_dataset, model, tokenizer):
                 output = model(**inputs)
                 outputs.append(output)
 
-            #TODO implement a function or logic to acquire best possible output, now based on lowest loss
+
             loss = min(outputs,key=lambda x: x[0])[0]
             # model outputs are always tuple in transformers (see doc)
             #loss = output[0]
@@ -707,13 +702,8 @@ def main():
         do_lower_case=args.do_lower_case,
         cache_dir=args.cache_dir if args.cache_dir else None,
     )
-    #model = AutoModelForQuestionAnswering.from_pretrained( ##TODO ODQA model
-    model = ODQAModel( #TODO ODQA model
-        args.model_name_or_path,
-        from_tf=bool(".ckpt" in args.model_name_or_path),
-        config=config,
-        cache_dir=args.cache_dir if args.cache_dir else None,
-    )
+
+    model = ODQAModel(config=config)
 
     if args.local_rank == 0:
         # Make sure only the first process in distributed training will download model & vocab
@@ -729,14 +719,12 @@ def main():
     if args.fp16:
         try:
             import apex
-
             apex.amp.register_half_function(torch, "einsum")
         except ImportError:
             raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
 
     # Training
     if args.do_train:
-        #TODO here run for loop for each question in train.json
         train_dataset = load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=False)
         global_step, tr_loss = train(args, train_dataset, model, tokenizer)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)

@@ -12,17 +12,11 @@ from transformers.file_utils import (
     add_start_docstrings_to_model_forward)
 from transformers.modeling_outputs import (
     QuestionAnsweringModelOutput)
-from transformers.modeling_bert import BertForQuestionAnswering, BertModel, BERT_INPUTS_DOCSTRING, _CONFIG_FOR_DOC, \
+from transformers.modeling_bert import BertForQuestionAnswering, BERT_INPUTS_DOCSTRING, _CONFIG_FOR_DOC, \
     _TOKENIZER_FOR_DOC
 
 
 class ODQAModel(BertForQuestionAnswering):
-    def __init__(self, cache_dir,config,from_tf):
-        super().__init__(config)
-        self.num_labels = config.num_labels
-        self.bert = BertModel(config, add_pooling_layer=False)
-        self.qa_outputs = nn.Linear(config.hidden_size, config.num_labels)
-        self.init_weights()
 
     @add_start_docstrings_to_model_forward(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
     @add_code_sample_docstrings(
