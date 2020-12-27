@@ -16,8 +16,8 @@ def compute_metrics_from_nbest(searchqa_dir, split, fname_nbest_preds):
         for uid in preds:
             qid, idx = uid.split("_")
             # Take only non-empty predictions
-            # pred = [p for p in preds[uid] if p["text"]][0]
-            pred = preds[uid][0] # sorted by probs (we are taking best one here)
+            pred = [p for p in preds[uid] if p["text"]][0]
+            # pred = preds[uid][0] # sorted by probs (we are taking best one here)
             ans, score = pred["text"], pred["probability"]
             qid2preds[int(qid)].append((ans, score))
     
@@ -99,5 +99,10 @@ Dev: {'f1': 62.841700834575406, 'em': 57.87806809184482} (ignoring where no pred
 
 Dev: {'f1': 58.785239569088134, 'em': 54.82617145324984} (when predicting as if SQuAD v1.1)
 Dev: {'f1': 58.785239569088134, 'em': 54.82617145324984} (same even when we take only non-empty strings)
+
+with empty strings:
+val: {'f1': 0.007197869430648528, 'em': 0.007197869430648528}
+
+with non-empty strings:
 
 """
