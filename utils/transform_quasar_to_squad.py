@@ -10,7 +10,8 @@ Context = collections.namedtuple("Context", ["text", "matches"])
 
 
 class SearchQAInstance:
-    def __init__(self, cont_path, uid, question, answer=None, contexts=None, split=None):
+    def __init__(self, counter, cont_path, uid, question, answer=None, contexts=None, split=None):
+        self.counter = counter
         self.cont_path = cont_path
         self.id = uid
         self.q = question
@@ -19,8 +20,7 @@ class SearchQAInstance:
         self.type = split
 
     @classmethod
-    def init(cls, cont_path, processed_line, split, uid=None):
-        global_cont = True
+    def init(cls, line_counter, cont_path, processed_line, split, uid=None):
 
         question = processed_line["question"]
         answer = processed_line["answer"]
@@ -42,7 +42,7 @@ class SearchQAInstance:
                         answers_matches_in_context = search_string(one_context, answer)
                         contexts.append(Context(one_context, answers_matches_in_context))
 
-        return cls(cont_path, uid, question, answer, contexts, split)
+        return cls(line_counter, cont_path, uid, question, answer, contexts, split)
 
     def __repr__(self):
         return "(Q = `{}` ; A = `{}` ; id = `{}` ; type = `{}`)".format(
@@ -84,23 +84,22 @@ class SearchQA:
                         uid += 1"""
 
         # my old code
-        cond = True
+        counter = 0
         quest_split_file_path = os.path.join(self.data_dir_quest, self.split + "_questions.json")
         cont_split_file_path = os.path.join(self.data_dir_cont, self.split + "_contexts.json")
         with open(quest_split_file_path, "r") as qf:
 
             # Parse each line separate to avoid memory issues
             for line in qf:
-                # line.strip()
+                counter += 1
                 parsed_question = json.loads(line)
                 question_id = parsed_question["uid"]
                 if not line:
                     continue
                 else:
-                    inst = SearchQAInstance.init(cont_split_file_path, parsed_question, self.split, question_id)
-                    if cond:
-                        print(inst)
-                        # cond = False
+                    inst = SearchQAInstance.init(counter, cont_split_file_path, parsed_question, self.split,
+                                                 question_id)
+                    print(inst)
                 yield inst
 
     def check_squad_example(self, example):
@@ -118,10 +117,15 @@ class SearchQA:
         total = 0
         for sqa_instance in self:
             if self.split == "train":
+                print(sqa_instance.counter)
+                if sqa_instance.counter == 2500:
+                    break
                 # Original SearchQA paper considers at most 50 contexts and ignore
                 # data points which contain less than 41 contexts for training.
-                contexts = sqa_instance.c[:50]
-                if len(contexts) < 41:
+                # contexts = sqa_instance.c[:50]
+                # if len(contexts) < 41:
+                contexts = sqa_instance.c[:40]
+                if len(contexts) < 40:
                     continue
             else:
                 contexts = sqa_instance.c
@@ -190,8 +194,9 @@ def search_string(text, string):
 def convert_searchqa_to_squad(quasar_dir_quest, quasar_dir_cont, output_dir, version):
     cond = True
 
-    # for split in ("train", "dev", "test"):
-    for split in ("dev", "test"):
+    # for split in ("dev", "test"):
+    for split in ("train", "dev", "test"):
+    # for split in ("train", "dev"):
         sqa = SearchQA(quasar_dir_quest, quasar_dir_cont, split)
         squad_like_split = sqa.to_squad(version)
 
@@ -225,5 +230,5 @@ if __name__ == "__main__":
         help="Whether to convert as SQuAD version 1.1 or 2.0"
     )
     args = parser.parse_args()
-    os.makedirs(args.output_dir, exist_ok=True)
+    # os.makedirs(args.output_dir, exist_ok=True)
     convert_searchqa_to_squad(args.quasar_dir_quest, args.quasar_dir_cont, args.output_dir, args.squad_version)
