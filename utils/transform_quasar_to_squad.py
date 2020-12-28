@@ -99,7 +99,7 @@ class SearchQA:
                 else:
                     inst = SearchQAInstance.init(counter, cont_split_file_path, parsed_question, self.split,
                                                  question_id)
-                    print(inst)
+                    # print(inst)
                 yield inst
 
     def check_squad_example(self, example):
@@ -130,6 +130,7 @@ class SearchQA:
                     continue
             else:
                 contexts = sqa_instance.c
+                # print(contexts)
 
             for idx, context in enumerate(contexts):
                 # Search for answer string in context
@@ -195,8 +196,8 @@ def search_string(text, string):
 def convert_searchqa_to_squad(quasar_dir_quest, quasar_dir_cont, output_dir, version):
     cond = True
 
-    for split in ("dev", "test"):
-    # for split in ("train", "dev", "test"):
+    # for split in ("dev", "test"):
+    for split in ("train", "dev", "test"):
     # for split in ("train", "dev"):
         sqa = SearchQA(quasar_dir_quest, quasar_dir_cont, split)
         squad_like_split = sqa.to_squad(version)
