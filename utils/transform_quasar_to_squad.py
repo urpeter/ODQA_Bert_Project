@@ -99,7 +99,7 @@ class SearchQA:
                 else:
                     inst = SearchQAInstance.init(counter, cont_split_file_path, parsed_question, self.split,
                                                  question_id)
-                    print(inst)
+                    # print(inst)
                 yield inst
 
     def check_squad_example(self, example):
@@ -117,15 +117,16 @@ class SearchQA:
         total = 0
         for sqa_instance in self:
             if self.split == "train":
-                print(sqa_instance.counter)
+                # print(sqa_instance.counter)
                 if sqa_instance.counter == 2500:
                     break
                 # Original SearchQA paper considers at most 50 contexts and ignore
                 # data points which contain less than 41 contexts for training.
                 # contexts = sqa_instance.c[:50]
                 # if len(contexts) < 41:
-                contexts = sqa_instance.c[:40]
-                if len(contexts) < 40:
+                contexts = sqa_instance.c[:41]
+                print(len(contexts))
+                if len(contexts) < 41:
                     continue
             else:
                 contexts = sqa_instance.c
@@ -194,8 +195,8 @@ def search_string(text, string):
 def convert_searchqa_to_squad(quasar_dir_quest, quasar_dir_cont, output_dir, version):
     cond = True
 
-    # for split in ("dev", "test"):
-    for split in ("train", "dev", "test"):
+    for split in ("dev", "test"):
+    # for split in ("train", "dev", "test"):
     # for split in ("train", "dev"):
         sqa = SearchQA(quasar_dir_quest, quasar_dir_cont, split)
         squad_like_split = sqa.to_squad(version)
@@ -230,5 +231,5 @@ if __name__ == "__main__":
         help="Whether to convert as SQuAD version 1.1 or 2.0"
     )
     args = parser.parse_args()
-    # os.makedirs(args.output_dir, exist_ok=True)
+    os.makedirs(args.output_dir, exist_ok=True)
     convert_searchqa_to_squad(args.quasar_dir_quest, args.quasar_dir_cont, args.output_dir, args.squad_version)
