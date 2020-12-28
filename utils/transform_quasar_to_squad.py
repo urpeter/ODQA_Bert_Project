@@ -99,7 +99,7 @@ class SearchQA:
                 else:
                     inst = SearchQAInstance.init(counter, cont_split_file_path, parsed_question, self.split,
                                                  question_id)
-                    # print(inst)
+                    print(inst)
                 yield inst
 
     def check_squad_example(self, example):
@@ -126,7 +126,7 @@ class SearchQA:
                 # if len(contexts) < 41:
                 contexts = sqa_instance.c[:41]
                 print(len(contexts))
-                if len(contexts) < 41:
+                if len(contexts) < 40:
                     continue
             else:
                 contexts = sqa_instance.c
