@@ -28,7 +28,7 @@ import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm, trange
-
+from utils.Candid_rep_UA import Candid_rep
 from transformers import (
     MODEL_FOR_QUESTION_ANSWERING_MAPPING,
     WEIGHTS_NAME,
@@ -194,10 +194,10 @@ def train(args, batch_dataset, model, tokenizer):
                     "start_positions": batch[3],
                     "end_positions": batch[4],
                 }
+
                 output = model(**inputs)
                 outputs.append(output)
 
-                #loss = min(outputs,key=lambda x: x[0])[0]
                 # model outputs are always tuple in transformers (see doc)
                 loss = output[0]
 
@@ -742,7 +742,6 @@ def main():
         tokenizer = AutoTokenizer.from_pretrained(args.output_dir, do_lower_case=args.do_lower_case)
         model.to(args.device)
 
-    # Not for now
 
     # Evaluation - we can ask to evaluate all the checkpoints (sub-directories) in a directory
     results = {}
