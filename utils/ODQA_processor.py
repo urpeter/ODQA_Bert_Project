@@ -10,8 +10,9 @@ class OdqaProcessor(squad.SquadV2Processor):
         for entry in tqdm(input_data):
             title = entry["title"]
             for paragraph in entry["paragraphs"]:
-                if paragraph["qas"]["question"] not in examples_dict.keys():
-                    examples_dict[paragraph["qas"]["question"]] = []
+                for qa_elem in paragraph["qas"]:
+                    if qa_elem["question"] not in examples_dict.keys():
+                        examples_dict[qa_elem["question"]] = []
 
                 context_text = paragraph["context"]
                 for qa in paragraph["qas"]:
@@ -41,4 +42,5 @@ class OdqaProcessor(squad.SquadV2Processor):
                         answers=answers,
                     )
                     examples_dict[paragraph["qas"]["question"]].append(example)
+                    #TODO update the examples dict[[41],[41]]
         return examples_dict

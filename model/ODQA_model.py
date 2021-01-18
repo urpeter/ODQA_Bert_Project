@@ -14,18 +14,18 @@ from transformers.modeling_outputs import (
     QuestionAnsweringModelOutput)
 from transformers.models.bert.modeling_bert import BertForQuestionAnswering, BERT_INPUTS_DOCSTRING, _CONFIG_FOR_DOC, \
     _TOKENIZER_FOR_DOC, BertModel
-
+from utils.Candid_rep_UA import Candid_rep
 
 class ODQAModel(BertForQuestionAnswering):
 
     def __init__(self, config):
         super().__init__(config)
         self.num_labels = config.num_labels
-
         self.bert = BertModel(config, add_pooling_layer=False)
         self.qa_outputs = nn.Linear(config.hidden_size, config.num_labels)
-
         self.init_weights()
+
+        self.candidate_representation = Candid_rep(k=82)
 
     @add_start_docstrings_to_model_forward(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
     @add_code_sample_docstrings(

@@ -28,7 +28,7 @@ import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm, trange
-from utils.Candid_rep_UA import Candid_rep
+
 from transformers import (
     MODEL_FOR_QUESTION_ANSWERING_MAPPING,
     WEIGHTS_NAME,
@@ -404,12 +404,13 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=Fal
 
             tfds_examples = tfds.load("squad")
             examples = SquadV1Processor().get_examples_from_dataset(tfds_examples, evaluate=evaluate)
-        else:
+        else: # TODO evaluate needs the  features, examples and the dataset
             processor = OdqaProcessor() if args.version_2_with_negative else SquadV1Processor()
             if evaluate:
                 examples = processor.get_dev_examples(args.data_dir, filename=args.predict_file)
             else:
                 examples = processor.get_train_examples(args.data_dir, filename=args.train_file)
+
 
         dataset_list = []
         for example in examples.values():
@@ -426,7 +427,7 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=Fal
             if args.local_rank in [-1, 0]:
                 logger.info("Saving features into cached file %s", cached_features_file)
                 torch.save({"features": features, "dataset": dataset, "examples": example}, cached_features_file)
-            dataset_list.append(dataset)
+            dataset_list.append(features,dataset)
 
     if args.local_rank == 0 and not evaluate:
         # Make sure only the first process in distributed training process the dataset, and the others will use the cache
