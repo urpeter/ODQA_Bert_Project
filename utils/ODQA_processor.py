@@ -6,7 +6,8 @@ class OdqaProcessor(squad.SquadV2Processor):
     # Each key is a question with a list of the examples corresponding to the question as the value
     def _create_examples(self, input_data, set_type):
         is_training = set_type == "train"
-        examples_dict = {}
+        examples_dict = {} # TODO Anastasia suggestion dict of tensors
+                           # TODO every question dict mit keys {context:..., questions, gt_contexts, answers, q_len, c_len,}
         for entry in tqdm(input_data):
             title = entry["title"]
             for paragraph in entry["paragraphs"]:
@@ -43,4 +44,4 @@ class OdqaProcessor(squad.SquadV2Processor):
                     )
                     examples_dict[paragraph["qas"]["question"]].append(example)
                     #TODO update the examples dict[[41],[41]]
-        return examples_dict
+        return examples_dict.values()

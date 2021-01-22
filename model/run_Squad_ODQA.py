@@ -25,6 +25,7 @@ import timeit
 
 import numpy as np
 import torch
+import torch.distributed
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm, trange
@@ -83,7 +84,7 @@ def train(args, batch_dataset, model, tokenizer):
     tr_loss, logging_loss = 0.0, 0.0
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
 
-    for train_dataset in batch_dataset:
+    for train_dataset in batch_dataset[0]:
         train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset)
         train_dataloader = DataLoader(train_dataset, sampler= train_sampler,batch_size=args.train_batch_size)
 
@@ -413,7 +414,8 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=Fal
 
 
         dataset_list = []
-        for example in examples.values():
+        features_list = []
+        for example in examples:
             features, dataset= squad_convert_examples_to_features(
                 examples=example,
                 tokenizer=tokenizer,
@@ -427,13 +429,14 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=Fal
             if args.local_rank in [-1, 0]:
                 logger.info("Saving features into cached file %s", cached_features_file)
                 torch.save({"features": features, "dataset": dataset, "examples": example}, cached_features_file)
-            dataset_list.append(features,dataset)
+            dataset_list.append(dataset)
+            features_list.append(features)
 
     if args.local_rank == 0 and not evaluate:
         # Make sure only the first process in distributed training process the dataset, and the others will use the cache
         torch.distributed.barrier()
 
-    return dataset_list
+    return dataset_list, examples, features_list
 
 
 def main():

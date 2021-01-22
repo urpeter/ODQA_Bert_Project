@@ -15,6 +15,7 @@ from transformers.modeling_outputs import (
 from transformers.models.bert.modeling_bert import BertForQuestionAnswering, BERT_INPUTS_DOCSTRING, _CONFIG_FOR_DOC, \
     _TOKENIZER_FOR_DOC, BertModel
 from utils.Candid_rep_UA import Candid_rep
+from utils.qa_utils import postprocess_qa_predictions
 
 class ODQAModel(BertForQuestionAnswering):
 
@@ -65,11 +66,12 @@ class ODQAModel(BertForQuestionAnswering):
         )
 
         sequence_output = outputs[0]
-
         logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1)
         end_logits = end_logits.squeeze(-1)
+
+        # <- Answer Selection Part
 
         total_loss = None
         if start_positions is not None and end_positions is not None:
@@ -83,7 +85,7 @@ class ODQAModel(BertForQuestionAnswering):
             start_positions.clamp_(0, ignored_index)
             end_positions.clamp_(0, ignored_index)
 
-            loss_fct = CrossEntropyLoss(ignore_index=ignored_index) # TODO Create our own loss function here
+            loss_fct = CrossEntropyLoss(ignore_index=ignored_index)
             start_loss = loss_fct(start_logits, start_positions)
             end_loss = loss_fct(end_logits, end_positions)
             total_loss = (start_loss + end_loss) / 2
@@ -92,12 +94,22 @@ class ODQAModel(BertForQuestionAnswering):
             output = (start_logits, end_logits) + outputs[2:]
             return ((total_loss,) + output) if total_loss is not None else output
 
-        return QuestionAnsweringModelOutput(
-            loss=total_loss,
-            start_logits=start_logits,
-            end_logits=end_logits,
-            hidden_states=outputs.hidden_states,
-            attentions=outputs.attentions,
-        )
+        #QA_Model_Output= QuestionAnsweringModelOutput(
+         #   loss=total_loss,
+          #  start_logits=start_logits,
+           # end_logits=end_logits,
+            #hidden_states=outputs.hidden_states,
+            #attentions=outputs.attentions,
+        #)
+        postprocess_qa_predictions(examples=,features=,version_2_with_negative=True)
 
+        candidate_spans = start_positions + end_positions  # TODO this is a dummy for
+                                                          # TODO the span of the answer candidate
+
+        self.candidate_representation.calculate_candidate_representations(S_p=S_p, spans=candidate_spans)
+        S_Cs = self.candidate_representation.S_Cs  # [200, 100, 200]
+        r_Cs = self.candidate_representation.r_Cs  # [200, 100]
+        r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
+        encoded_candidates = self.candidate_representation.encoded_candidates
+        return
 
