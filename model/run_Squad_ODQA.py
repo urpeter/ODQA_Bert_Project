@@ -84,7 +84,7 @@ def train(args, batch_dataset, model, tokenizer):
     tr_loss, logging_loss = 0.0, 0.0
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
 
-    for train_dataset in batch_dataset[0]:
+    for train_dataset in batch_dataset[0]: #TODO following could fuck up the process
         train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset)
         train_dataloader = DataLoader(train_dataset, sampler= train_sampler,batch_size=args.train_batch_size)
 
