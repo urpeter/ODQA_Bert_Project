@@ -25,7 +25,6 @@ class ODQAModel(BertForQuestionAnswering):
         self.bert = BertModel(config, add_pooling_layer=False)
         self.qa_outputs = nn.Linear(config.hidden_size, config.num_labels)
         self.init_weights()
-
         self.candidate_representation = Candid_rep(k=82)
 
     @add_start_docstrings_to_model_forward(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
@@ -35,6 +34,7 @@ class ODQAModel(BertForQuestionAnswering):
         output_type=QuestionAnsweringModelOutput,
         config_class=_CONFIG_FOR_DOC,
     )
+
     def forward(
         self,
         input_ids=None,
@@ -101,10 +101,15 @@ class ODQAModel(BertForQuestionAnswering):
             #hidden_states=outputs.hidden_states,
             #attentions=outputs.attentions,
         #)
-        postprocess_qa_predictions(examples=,features=,version_2_with_negative=True)
+        predictions_dict = postprocess_qa_predictions(examples=self.examples,
+                                                      features=self.features,
+                                                      predictions=(start_logits, end_logits),
+                                                      version_2_with_negative=True,
+                                                      n_best_size=1
+                                                      )
 
-        candidate_spans = start_positions + end_positions  # TODO this is a dummy for
-                                                          # TODO the span of the answer candidate
+        candidate_spans = predictions_dict[self.examples.qas_id]["start_index"] + \
+                          predictions_dict[self.examples.qas_id]["end_index"]
 
         self.candidate_representation.calculate_candidate_representations(S_p=S_p, spans=candidate_spans)
         S_Cs = self.candidate_representation.S_Cs  # [200, 100, 200]
@@ -112,4 +117,9 @@ class ODQAModel(BertForQuestionAnswering):
         r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
         encoded_candidates = self.candidate_representation.encoded_candidates
         return
+
+    def get_examples_and_features(self, examples, features):
+        self.features = features
+        self.examples = examples
+
 
