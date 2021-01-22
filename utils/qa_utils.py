@@ -150,6 +150,8 @@ def postprocess_qa_predictions(
                             "score": start_logits[start_index] + end_logits[end_index],
                             "start_logit": start_logits[start_index],
                             "end_logit": end_logits[end_index],
+                            "start_index": start_index,
+                            "end_index": end_index,
                         }
                     )
         if version_2_with_negative:
