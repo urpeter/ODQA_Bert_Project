@@ -94,13 +94,7 @@ class ODQAModel(BertForQuestionAnswering):
             output = (start_logits, end_logits) + outputs[2:]
             return ((total_loss,) + output) if total_loss is not None else output
 
-        #QA_Model_Output= QuestionAnsweringModelOutput(
-         #   loss=total_loss,
-          #  start_logits=start_logits,
-           # end_logits=end_logits,
-            #hidden_states=outputs.hidden_states,
-            #attentions=outputs.attentions,
-        #)
+
         predictions_dict = postprocess_qa_predictions(examples=self.examples,
                                                       features=self.features,
                                                       predictions=(start_logits, end_logits),
@@ -111,12 +105,19 @@ class ODQAModel(BertForQuestionAnswering):
         candidate_spans = predictions_dict[self.examples.qas_id]["start_index"] + \
                           predictions_dict[self.examples.qas_id]["end_index"]
 
-        self.candidate_representation.calculate_candidate_representations(S_p=S_p, spans=candidate_spans)
-        S_Cs = self.candidate_representation.S_Cs  # [200, 100, 200]
-        r_Cs = self.candidate_representation.r_Cs  # [200, 100]
-        r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
-        encoded_candidates = self.candidate_representation.encoded_candidates
-        return
+        return QuestionAnsweringModelOutput(
+            loss=total_loss,
+            start_logits=start_logits,
+            end_logits=end_logits,
+            hidden_states=outputs.hidden_states,
+            attentions=outputs.attentions,
+        )
+        #self.candidate_representation.calculate_candidate_representations(S_p=S_p, spans=candidate_spans)
+        #S_Cs = self.candidate_representation.S_Cs  # [200, 100, 200]
+        #r_Cs = self.candidate_representation.r_Cs  # [200, 100]
+        #r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
+        #encoded_candidates = self.candidate_representation.encoded_candidates
+
 
     def get_examples_and_features(self, examples, features):
         self.features = features
