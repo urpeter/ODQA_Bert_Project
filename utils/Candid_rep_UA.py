@@ -1,4 +1,3 @@
-from utils.candidate_representation import Candidate_Representation
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

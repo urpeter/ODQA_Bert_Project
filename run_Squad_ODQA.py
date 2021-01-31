@@ -39,6 +39,7 @@ from transformers import (
     AutoTokenizer,
     get_linear_schedule_with_warmup,
     squad_convert_examples_to_features,
+    BertTokenizer,
 )
 from transformers.data.metrics.squad_metrics import (
     compute_predictions_log_probs,
@@ -176,7 +177,7 @@ def train(args, batch_dataset, model, tokenizer):
         for _ in train_iterator:
             epoch_iterator = tqdm(train_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
 
-            for step, batch in enumerate(epoch_iterator):
+            for step, batch in tqdm(enumerate(epoch_iterator),desc="Step and Batch"):
 
                 # Skip past any already trained steps if resuming training
                 if steps_trained_in_current_epoch > 0:
@@ -418,7 +419,7 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=Fal
 
         dataset_list = []
         features_list = []
-        for example in examples:
+        for example in tqdm(examples[0:1],desc="Examples"):
             features, dataset= squad_convert_examples_to_features(
                 examples=example,
                 tokenizer=tokenizer,
@@ -694,15 +695,16 @@ def main():
         # Make sure only the first process in distributed training will download model & vocab
         torch.distributed.barrier()
 
-    args.model_type = args.mode_ltype.lower()
+    args.model_type = args.model_type.lower()
     config = AutoConfig.from_pretrained(
         args.config_name if args.config_name else args.model_name_or_path,
         cache_dir=args.cache_dir if args.cache_dir else None,
     )
-    tokenizer = AutoTokenizer.from_pretrained(
-        args.tokenizer_name if args.tokenizer_name else args.model_name_or_path,
-        do_lower_case=args.do_lower_case,
-        cache_dir=args.cache_dir if args.cache_dir else None,
+    tokenizer = BertTokenizer.from_pretrained(
+        "bert-base-uncased"
+        #args.tokenizer_name if args.tokenizer_name else args.model_name_or_path,
+        #do_lower_case=args.do_lower_case,
+        #cache_dir=args.cache_dir if args.cache_dir else None,
     )
 
     model = ODQAModel(config=config)
