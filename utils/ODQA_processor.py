@@ -42,6 +42,6 @@ class OdqaProcessor(squad.SquadV2Processor):
                         is_impossible=is_impossible,
                         answers=answers,
                     )
-                    examples_dict[paragraph["qas"]["question"]].append(example)
+                    examples_dict[paragraph["qas"][0]["question"]].append(example)
                     #TODO update the examples dict[[41],[41]]
-        return examples_dict.values()
+        return list(examples_dict.values())
