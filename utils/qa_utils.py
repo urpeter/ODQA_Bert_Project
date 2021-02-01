@@ -86,6 +86,8 @@ def postprocess_qa_predictions(
     # The dictionaries we have to fill.
     all_predictions = collections.OrderedDict()
     all_nbest_json = collections.OrderedDict()
+    ODQA_pred = dict()
+
     if version_2_with_negative:
         scores_diff_json = collections.OrderedDict()
 
@@ -100,6 +102,7 @@ def postprocess_qa_predictions(
 
         min_null_prediction = None
         prelim_predictions = []
+
 
         # Looping through all the features associated to the current example.
         for feature_index in feature_indices:
@@ -154,6 +157,17 @@ def postprocess_qa_predictions(
                             "end_index": end_index,
                         }
                     )
+                    #TODO maybe needs dict.update() in 167
+                    if example["id"] not in ODQA_pred.keys():
+                        ODQA_pred[example["id"]] = prelim_predictions[-1]
+                        ODQA_pred[example["id"]]['candidate_span'] = prelim_predictions[-1]['start_index'] + \
+                                                                  prelim_predictions[-1]['end_index']
+                    elif prelim_predictions[-1]["score"] > ODQA_pred[example["id"]]["score"]:
+                        ODQA_pred[example["id"]].update(prelim_predictions[-1])
+                        ODQA_pred[example["id"]]['candidate_span'] = prelim_predictions[-1]['start_index'] + \
+                                                                  prelim_predictions[-1]['end_index']
+
+
         if version_2_with_negative:
             # Add the minimum null prediction
             prelim_predictions.append(min_null_prediction)
@@ -237,4 +251,4 @@ def postprocess_qa_predictions(
             with open(null_odds_file, "w") as writer:
                 writer.write(json.dumps(scores_diff_json, indent=4) + "\n")
 
-    return all_predictions
+    return all_predictions, list(ODQA_pred.values())

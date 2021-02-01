@@ -26,6 +26,8 @@ class ODQAModel(BertForQuestionAnswering):
         self.qa_outputs = nn.Linear(config.hidden_size, config.num_labels)
         self.init_weights()
         self.candidate_representation = Candid_rep(k=82)
+        self.examples = None
+        self.features = None
 
     @add_start_docstrings_to_model_forward(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
     @add_code_sample_docstrings(
@@ -95,28 +97,32 @@ class ODQAModel(BertForQuestionAnswering):
             return ((total_loss,) + output) if total_loss is not None else output
 
 
-        predictions_dict = postprocess_qa_predictions(examples=self.examples,
+        predictions_dict, ODQA_predictions_list = postprocess_qa_predictions(examples=self.examples,
                                                       features=self.features,
                                                       predictions=(start_logits, end_logits),
                                                       version_2_with_negative=True,
                                                       n_best_size=1
                                                       )
 
-        candidate_spans = predictions_dict[self.examples.qas_id]["start_index"] + \
-                          predictions_dict[self.examples.qas_id]["end_index"]
+        #candidate_spans = predictions_dict[self.examples.qas_id]["start_index"] + \
+         #                 predictions_dict[self.examples.qas_id]["end_index"]
+        candidate_spans_list = [x['candidate_span'] for x in ODQA_predictions_list]
+        start_indices = [x['start_index'] for x in ODQA_predictions_list]
+        end_indices = [x['end_index'] for x in ODQA_predictions_list]
+        texts = [x['text'] for x in ODQA_predictions_list]
 
-        return QuestionAnsweringModelOutput(
+        QA_output = QuestionAnsweringModelOutput(
             loss=total_loss,
             start_logits=start_logits,
             end_logits=end_logits,
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
-        #self.candidate_representation.calculate_candidate_representations(S_p=S_p, spans=candidate_spans)
-        #S_Cs = self.candidate_representation.S_Cs  # [200, 100, 200]
-        #r_Cs = self.candidate_representation.r_Cs  # [200, 100]
-        #r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
-        #encoded_candidates = self.candidate_representation.encoded_candidates
+        self.candidate_representation.calculate_candidate_representations(S_p=S_p, spans=candidate_spans)
+        S_Cs = self.candidate_representation.S_Cs  # [200, 100, 200]
+        r_Cs = self.candidate_representation.r_Cs  # [200, 100]
+        r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
+        encoded_candidates = self.candidate_representation.encoded_candidates
 
 
     def get_examples_and_features(self, examples, features):

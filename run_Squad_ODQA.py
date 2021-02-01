@@ -730,7 +730,7 @@ def main():
     # Training
     if args.do_train:
         train_dataset = load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=False)
-        global_step, tr_loss = train(args, train_dataset, model, tokenizer)
+        global_step, tr_loss = train(args, train_dataset[1], model, tokenizer)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
 
     # Save the trained model and the tokenizer
