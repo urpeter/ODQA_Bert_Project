@@ -420,7 +420,7 @@ def load_and_cache_examples(args, tokenizer, evaluate=False, output_examples=Fal
 
 
 
-        for example in tqdm(examples,desc="Examples"):
+        for example in tqdm(examples[:1],desc="Examples"):
             features, dataset= squad_convert_examples_to_features(
                 examples=example,
                 tokenizer=tokenizer,
