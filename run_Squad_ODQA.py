@@ -189,8 +189,8 @@ def train(args, batch_dataset, model, tokenizer):
 
                 batch = tuple(t.to(args.device) for t in batch)
 
-                examples_list, features_list = batch_dataset[1:]
-                model.get_examples_and_features(examples_list[step-1],features_list[step-1])
+                dataset_list, examples_list, features_list = batch_dataset
+                model.get_examples_and_features(examples_list[step],features_list[step])
 
                 inputs = {
                     "input_ids": batch[0],
