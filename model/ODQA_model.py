@@ -96,7 +96,6 @@ class ODQAModel(BertForQuestionAnswering):
             output = (start_logits, end_logits) + outputs[2:]
             return ((total_loss,) + output) if total_loss is not None else output
 
-
         predictions_dict, ODQA_predictions_list = postprocess_qa_predictions(examples=self.examples,
                                                       features=self.features,
                                                       predictions=(start_logits, end_logits),
