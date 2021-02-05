@@ -79,10 +79,10 @@ def postprocess_qa_predictions(
 
     # Build a map example to its corresponding features.
     print(examples)
-    example_id_to_index = {k: i for i, k in enumerate(examples[0]["id"])}
+    example_id_to_index = {k: i for i, k in enumerate(examples[0]["qas_id"])}
     features_per_example = collections.defaultdict(list)
     for i, feature in enumerate(features):
-        features_per_example[example_id_to_index[feature["example_id"]]].append(i)
+        features_per_example[example_id_to_index[feature["qas_id"]]].append(i)
 
     # The dictionaries we have to fill.
     all_predictions = collections.OrderedDict()
@@ -159,13 +159,13 @@ def postprocess_qa_predictions(
                         }
                     )
                     #TODO maybe needs dict.update() in 167
-                    if example["id"] not in ODQA_pred.keys():
-                        ODQA_pred[example["id"]] = prelim_predictions[-1]
-                        ODQA_pred[example["id"]]['candidate_span'] = prelim_predictions[-1]['start_index'] + \
+                    if example["qas_id"] not in ODQA_pred.keys():
+                        ODQA_pred[example["qas_id"]] = prelim_predictions[-1]
+                        ODQA_pred[example["qas_id"]]['candidate_span'] = prelim_predictions[-1]['start_index'] + \
                                                                   prelim_predictions[-1]['end_index']
-                    elif prelim_predictions[-1]["score"] > ODQA_pred[example["id"]]["score"]:
-                        ODQA_pred[example["id"]].update(prelim_predictions[-1])
-                        ODQA_pred[example["id"]]['candidate_span'] = prelim_predictions[-1]['start_index'] + \
+                    elif prelim_predictions[-1]["score"] > ODQA_pred[example["qas_id"]]["score"]:
+                        ODQA_pred[example["qas_id"]].update(prelim_predictions[-1])
+                        ODQA_pred[example["qas_id"]]['candidate_span'] = prelim_predictions[-1]['start_index'] + \
                                                                   prelim_predictions[-1]['end_index']
 
 
@@ -204,7 +204,7 @@ def postprocess_qa_predictions(
 
         # Pick the best prediction. If the null answer is not possible, this is easy.
         if not version_2_with_negative:
-            all_predictions[example["id"]] = predictions[0]["text"]
+            all_predictions[example["qas_id"]] = predictions[0]["text"]
         else:
             # Otherwise we first need to find the best non-empty prediction.
             i = 0
@@ -214,14 +214,14 @@ def postprocess_qa_predictions(
 
             # Then we compare to the null prediction using the threshold.
             score_diff = null_score - best_non_null_pred["start_logit"] - best_non_null_pred["end_logit"]
-            scores_diff_json[example["id"]] = float(score_diff)  # To be JSON-serializable.
+            scores_diff_json[example["qas_id"]] = float(score_diff)  # To be JSON-serializable.
             if score_diff > null_score_diff_threshold:
-                all_predictions[example["id"]] = ""
+                all_predictions[example["qas_id"]] = ""
             else:
-                all_predictions[example["id"]] = best_non_null_pred["text"]
+                all_predictions[example["qas_id"]] = best_non_null_pred["text"]
 
         # Make `predictions` JSON-serializable by casting np.float back to float.
-        all_nbest_json[example["id"]] = [
+        all_nbest_json[example["qas_id"]] = [
             {k: (float(v) if isinstance(v, (np.float16, np.float32, np.float64)) else v) for k, v in pred.items()}
             for pred in predictions
         ]
