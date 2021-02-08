@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 class Candid_rep():
 
-    def __init__(self, k=2):
+    def __init__(self, k=1):
         super(Candid_rep, self).__init__()
         self.k = k
         self.wb = nn.Linear(768, 768, bias=False)

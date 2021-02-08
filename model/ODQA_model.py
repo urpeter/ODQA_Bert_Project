@@ -117,6 +117,8 @@ class ODQAModel(BertForQuestionAnswering):
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
+        # spans in the original is structured like [passages, number of candidates, span of the answer]
+        candidate_spans = torch.stack(candidate_spans_list, dim = 0)
         self.candidate_representation.calculate_candidate_representations(S_p=S_p, spans=candidate_spans)
         S_Cs = self.candidate_representation.S_Cs  # [200, 100, 200]
         r_Cs = self.candidate_representation.r_Cs  # [200, 100]
