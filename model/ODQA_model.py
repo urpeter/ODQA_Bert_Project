@@ -16,7 +16,7 @@ from transformers.modeling_bert import BertForQuestionAnswering, BERT_INPUTS_DOC
     _TOKENIZER_FOR_DOC, BertModel
 from utils.Candid_rep_UA import Candid_rep
 from utils.qa_utils import postprocess_qa_predictions
-
+from transformers.data.metrics import squad_metrics
 
 class ODQAModel(BertForQuestionAnswering):
 
@@ -104,12 +104,15 @@ class ODQAModel(BertForQuestionAnswering):
 
         #candidate_spans = predictions_dict[self.examples.qas_id]["start_index"] + \
          #                 predictions_dict[self.examples.qas_id]["end_index"]
+        start_indexes = squad_metrics._get_best_indexes(start_logits, n_best_size=1)
+        end_indexes = squad_metrics._get_best_indexes(end_logits, n_best_size=1)
+
         candidate_spans_list = [x['candidate_span'] for x in ODQA_predictions_list]
         start_indices = [x['start_index'] for x in ODQA_predictions_list]
         end_indices = [x['end_index'] for x in ODQA_predictions_list]
         texts = [x['text'] for x in ODQA_predictions_list]
 
-        QA_output = QuestionAnsweringModelOutput(
+        return QuestionAnsweringModelOutput(
             loss=total_loss,
             start_logits=start_logits,
             end_logits=end_logits,
