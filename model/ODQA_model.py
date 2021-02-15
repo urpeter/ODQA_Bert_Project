@@ -111,7 +111,9 @@ class ODQAModel(BertForQuestionAnswering):
         start_indices = [x['start_index'] for x in ODQA_predictions_list]
         end_indices = [x['end_index'] for x in ODQA_predictions_list]
         texts = [x['text'] for x in ODQA_predictions_list]
-
+        print("candidate_spans_list",candidate_spans_list,"\n")
+        candidate_spans = torch.stack(candidate_spans_list, dim=0)
+        print("candidate_spans",candidate_spans,"\n")
         return QuestionAnsweringModelOutput(
             loss=total_loss,
             start_logits=start_logits,
@@ -120,7 +122,6 @@ class ODQAModel(BertForQuestionAnswering):
             attentions=outputs.attentions,
         )
         # spans in the original is structured like [passages, number of candidates, span of the answer]
-        candidate_spans = torch.stack(candidate_spans_list, dim = 0)
         self.candidate_representation.calculate_candidate_representations(S_p=S_p, spans=candidate_spans)
         S_Cs = self.candidate_representation.S_Cs  # [200, 100, 200]
         r_Cs = self.candidate_representation.r_Cs  # [200, 100]
