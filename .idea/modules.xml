@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/ODQA_Bert_Project.iml" filepath="$PROJECT_DIR$/.idea/ODQA_Bert_Project.iml" />
       <module fileurl="file://$PROJECT_DIR$/../ODQA_vanessa/.idea/ODQA_vanessa.iml" filepath="$PROJECT_DIR$/../ODQA_vanessa/.idea/ODQA_vanessa.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../transformers/.idea/transformers.iml" filepath="$PROJECT_DIR$/../transformers/.idea/transformers.iml" />
     </modules>
   </component>
 </project>

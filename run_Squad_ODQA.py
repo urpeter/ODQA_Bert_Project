@@ -40,6 +40,7 @@ from transformers import (
     get_linear_schedule_with_warmup,
     squad_convert_examples_to_features,
     BertTokenizer,
+    tokenization_utils_fast,
 )
 from transformers.data.metrics.squad_metrics import (
     compute_predictions_log_probs,
@@ -50,6 +51,8 @@ from transformers.data.processors.squad import SquadResult, SquadV1Processor, Sq
 
 from model.ODQA_model import ODQAModel
 from utils.ODQA_processor import OdqaProcessor
+#from utils.tokenization_utils_fast import PreTrainedTokenizerFast
+from utils.Tokenizer_with_Mapping import ODQATokenizerFast
 try:
     from torch.utils.tensorboard import SummaryWriter
 except ImportError:
@@ -701,11 +704,14 @@ def main():
         args.config_name if args.config_name else args.model_name_or_path,
         cache_dir=args.cache_dir if args.cache_dir else None,
     )
-    tokenizer = BertTokenizer.from_pretrained(
-        "bert-base-uncased"
+    tokenizer = ODQATokenizerFast.from_pretrained(
+        "bert-base-uncased",
         #args.tokenizer_name if args.tokenizer_name else args.model_name_or_path,
-        #do_lower_case=args.do_lower_case,
-        #cache_dir=args.cache_dir if args.cache_dir else None,
+        do_lower_case=args.do_lower_case,
+        cache_dir=args.cache_dir if args.cache_dir else None,
+        is_split_into_words=True,
+
+
     )
 
     model = ODQAModel(config=config)

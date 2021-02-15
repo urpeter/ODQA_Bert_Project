@@ -9,27 +9,25 @@ from torch import nn
 from torch.nn import CrossEntropyLoss, MSELoss
 from transformers.file_utils import (
     add_code_sample_docstrings,
-    add_start_docstrings_to_model_forward)
+    add_start_docstrings_to_callable)
 from transformers.modeling_outputs import (
     QuestionAnsweringModelOutput)
-from transformers.models.bert.modeling_bert import BertForQuestionAnswering, BERT_INPUTS_DOCSTRING, _CONFIG_FOR_DOC, \
+from transformers.modeling_bert import BertForQuestionAnswering, BERT_INPUTS_DOCSTRING, _CONFIG_FOR_DOC, \
     _TOKENIZER_FOR_DOC, BertModel
 from utils.Candid_rep_UA import Candid_rep
 from utils.qa_utils import postprocess_qa_predictions
+
 
 class ODQAModel(BertForQuestionAnswering):
 
     def __init__(self, config):
         super().__init__(config)
-        self.num_labels = config.num_labels
-        self.bert = BertModel(config, add_pooling_layer=False)
-        self.qa_outputs = nn.Linear(config.hidden_size, config.num_labels)
-        self.init_weights()
+
         self.candidate_representation = Candid_rep(k=82)
         self.examples = None
         self.features = None
 
-    @add_start_docstrings_to_model_forward(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
+    @add_start_docstrings_to_callable(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
     @add_code_sample_docstrings(
         tokenizer_class=_TOKENIZER_FOR_DOC,
         checkpoint="bert-base-uncased",
@@ -68,6 +66,7 @@ class ODQAModel(BertForQuestionAnswering):
         )
 
         sequence_output = outputs[0]
+
         logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1)
