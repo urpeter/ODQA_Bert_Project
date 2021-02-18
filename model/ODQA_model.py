@@ -91,6 +91,11 @@ class ODQAModel(BertForQuestionAnswering):
             end_loss = loss_fct(end_logits, end_positions)
             total_loss = (start_loss + end_loss) / 2
 
+        start_indexes = squad_metrics._get_best_indexes(start_logits, n_best_size=1)
+        end_indexes = squad_metrics._get_best_indexes(end_logits, n_best_size=1)
+        print("start_indexes", start_indexes)
+        print("end_indexes", end_indexes)
+
         if not return_dict:
             print("NOT RETURN DICT")
             output = (start_logits, end_logits) + outputs[2:]
@@ -106,10 +111,7 @@ class ODQAModel(BertForQuestionAnswering):
 
         #candidate_spans = predictions_dict[self.examples.qas_id]["start_index"] + \
          #                 predictions_dict[self.examples.qas_id]["end_index"]
-        start_indexes = squad_metrics._get_best_indexes(start_logits, n_best_size=1)
-        end_indexes = squad_metrics._get_best_indexes(end_logits, n_best_size=1)
-        print("start_indexes",start_indexes)
-        print("end_indexes", end_indexes)
+
 
         #candidate_spans_list = [x['candidate_span'] for x in ODQA_predictions_list]
         #start_indices = [x['start_index'] for x in ODQA_predictions_list]
