@@ -710,7 +710,7 @@ def main():
         is_split_into_words=True,
     )
 
-    model = ODQAModel.from_pretrained("bert-base-uncased", return_dict=True)
+    model = ODQAModel.from_pretrained("bert-base-uncased", config, return_dict=True)
 
     if args.local_rank == 0:
         # Make sure only the first process in distributed training will download model & vocab
