@@ -701,14 +701,13 @@ def main():
     config = AutoConfig.from_pretrained(
         args.config_name if args.config_name else args.model_name_or_path,
         cache_dir=args.cache_dir if args.cache_dir else None,
+
     )
     tokenizer = BertTokenizer.from_pretrained(
         "bert-base-uncased", #args.tokenizer_name if args.tokenizer_name else args.model_name_or_path,
         do_lower_case=args.do_lower_case,
         cache_dir=args.cache_dir if args.cache_dir else None,
         is_split_into_words=True,
-
-
     )
 
     model = ODQAModel.from_pretrained("bert-base-uncased", return_dict=True)

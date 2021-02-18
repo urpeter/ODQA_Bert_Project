@@ -17,10 +17,11 @@ from transformers.modeling_bert import BertForQuestionAnswering, BERT_INPUTS_DOC
 from utils.Candid_rep_UA import Candid_rep
 from utils.qa_utils import postprocess_qa_predictions
 from transformers.data.metrics import squad_metrics
-
+from transformers.configuration_bert import BertConfig
 class ODQAModel(BertForQuestionAnswering):
 
-    def __init__(self, config):
+    def __init__(self):
+        config = BertConfig.from_pretrained('bert-base-uncased')
         super().__init__(config)
 
         self.candidate_representation = Candid_rep(k=82)
@@ -95,25 +96,27 @@ class ODQAModel(BertForQuestionAnswering):
             output = (start_logits, end_logits) + outputs[2:]
             return ((total_loss,) + output) if total_loss is not None else output
 
-        predictions_dict, ODQA_predictions_list = postprocess_qa_predictions(examples=self.examples,
-                                                      features=self.features,
-                                                      predictions=(start_logits, end_logits),
-                                                      version_2_with_negative=True,
-                                                      n_best_size=1
-                                                      )
+        #predictions_dict, ODQA_predictions_list = postprocess_qa_predictions(examples=self.examples,
+         #                                             features=self.features,
+          #                                            predictions=(start_logits, end_logits),
+           #                                           version_2_with_negative=True,
+            #                                          n_best_size=1
+             #                                         )
 
         #candidate_spans = predictions_dict[self.examples.qas_id]["start_index"] + \
          #                 predictions_dict[self.examples.qas_id]["end_index"]
         start_indexes = squad_metrics._get_best_indexes(start_logits, n_best_size=1)
         end_indexes = squad_metrics._get_best_indexes(end_logits, n_best_size=1)
+        print("start_indexes",start_indexes)
+        print("end_indexes", end_indexes)
 
-        candidate_spans_list = [x['candidate_span'] for x in ODQA_predictions_list]
-        start_indices = [x['start_index'] for x in ODQA_predictions_list]
-        end_indices = [x['end_index'] for x in ODQA_predictions_list]
-        texts = [x['text'] for x in ODQA_predictions_list]
-        print("candidate_spans_list",candidate_spans_list,"\n")
-        candidate_spans = torch.stack(candidate_spans_list, dim=0)
-        print("candidate_spans",candidate_spans,"\n")
+        #candidate_spans_list = [x['candidate_span'] for x in ODQA_predictions_list]
+        #start_indices = [x['start_index'] for x in ODQA_predictions_list]
+        #end_indices = [x['end_index'] for x in ODQA_predictions_list]
+        #texts = [x['text'] for x in ODQA_predictions_list]
+        #print("candidate_spans_list",candidate_spans_list,"\n")
+        #candidate_spans = torch.stack(candidate_spans_list, dim=0)
+        #print("candidate_spans",candidate_spans,"\n")
         return QuestionAnsweringModelOutput(
             loss=total_loss,
             start_logits=start_logits,
