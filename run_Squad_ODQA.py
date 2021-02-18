@@ -50,6 +50,7 @@ from transformers.data.processors.squad import SquadResult, SquadV1Processor, Sq
 
 from model.ODQA_model import ODQAModel
 from utils.ODQA_processor import OdqaProcessor
+from utils.ODQA_config import ODQA_config
 #from utils.tokenization_utils_fast import PreTrainedTokenizerFast
 try:
     from torch.utils.tensorboard import SummaryWriter
@@ -698,7 +699,7 @@ def main():
         torch.distributed.barrier()
 
     args.model_type = args.model_type.lower()
-    config = AutoConfig.from_pretrained(
+    config = ODQA_config.from_pretrained(
         args.config_name if args.config_name else args.model_name_or_path,
         cache_dir=args.cache_dir if args.cache_dir else None,
     )
