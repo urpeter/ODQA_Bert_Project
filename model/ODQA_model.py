@@ -90,7 +90,7 @@ class ODQAModel(BertForQuestionAnswering):
             start_loss = loss_fct(start_logits, start_positions)
             end_loss = loss_fct(end_logits, end_positions)
             total_loss = (start_loss + end_loss) / 2
-        print("\n")
+        print(start_logits[1])
         print("start_logits",list(enumerate(start_logits)), len(list(enumerate(start_logits))))
 
         start_indexes = squad_metrics._get_best_indexes(start_logits, n_best_size=41)
