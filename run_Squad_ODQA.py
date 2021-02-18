@@ -699,7 +699,7 @@ def main():
         torch.distributed.barrier()
 
     args.model_type = args.model_type.lower()
-    config = ODQA_config.from_pretrained(
+    config = AutoConfig.from_pretrained(
         args.config_name if args.config_name else args.model_name_or_path,
         cache_dir=args.cache_dir if args.cache_dir else None,
     )
