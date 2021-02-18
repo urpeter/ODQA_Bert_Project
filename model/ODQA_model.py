@@ -69,7 +69,6 @@ class ODQAModel(BertForQuestionAnswering):
 
         logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
-        start_indexes = squad_metrics._get_best_indexes(start_logits, n_best_size=41)
         start_logits = start_logits.squeeze(-1)
         end_logits = end_logits.squeeze(-1)
 
