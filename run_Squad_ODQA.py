@@ -700,7 +700,7 @@ def main():
     args.model_type = args.model_type.lower()
     config = AutoConfig.from_pretrained(
         args.config_name if args.config_name else args.model_name_or_path,
-        cache_dir=args.cache_dir if args.cache_dir else None, return_dict=True,
+        cache_dir=args.cache_dir if args.cache_dir else None,
     )
     tokenizer = BertTokenizer.from_pretrained(
         "bert-base-uncased", #args.tokenizer_name if args.tokenizer_name else args.model_name_or_path,
@@ -709,7 +709,7 @@ def main():
         is_split_into_words=True,
     )
 
-    model = ODQAModel.from_pretrained("bert-base-uncased", config)
+    model = ODQAModel.from_pretrained("bert-base-uncased", config,return_dict=True,)
 
     if args.local_rank == 0:
         # Make sure only the first process in distributed training will download model & vocab
