@@ -17,16 +17,16 @@ from transformers.modeling_bert import BertForQuestionAnswering, BERT_INPUTS_DOC
 from utils.Candid_rep_UA import Candid_rep
 from utils.qa_utils import postprocess_qa_predictions
 from transformers.data.metrics import squad_metrics
-from transformers.configuration_bert import BertConfig
+
 class ODQAModel(BertForQuestionAnswering):
 
-    def __init__(self, config,return_dict):
+    def __init__(self, config):
         super().__init__(config)
 
         self.candidate_representation = Candid_rep(k=82)
         self.examples = None
         self.features = None
-        self.return_dict = return_dict
+
     @add_start_docstrings_to_callable(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
     @add_code_sample_docstrings(
         tokenizer_class=_TOKENIZER_FOR_DOC,
@@ -55,7 +55,7 @@ class ODQAModel(BertForQuestionAnswering):
             Positions are clamped to the length of the sequence (:obj:`sequence_length`). Position outside of the
             sequence are not taken into account for computing the loss.
         """
-        return_dict = self.return_dict if return_dict is not None else self.config.use_return_dict
+        return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
         outputs = self.bert(
             input_ids,
@@ -92,7 +92,9 @@ class ODQAModel(BertForQuestionAnswering):
             total_loss = (start_loss + end_loss) / 2
 
         if not return_dict:
+            print("NOT RETURN DICT")
             output = (start_logits, end_logits) + outputs[2:]
+            print(output)
             return ((total_loss,) + output) if total_loss is not None else output
 
         #predictions_dict, ODQA_predictions_list = postprocess_qa_predictions(examples=self.examples,
