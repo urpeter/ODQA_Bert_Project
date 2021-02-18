@@ -93,8 +93,8 @@ class ODQAModel(BertForQuestionAnswering):
         print("\n")
         print("start_logits",list(enumerate(start_logits)), len(list(enumerate(start_logits))))
 
-        start_indexes = squad_metrics._get_best_indexes(start_logits, n_best_size=1)
-        end_indexes = squad_metrics._get_best_indexes(end_logits, n_best_size=1)
+        start_indexes = squad_metrics._get_best_indexes(start_logits, n_best_size=41)
+        end_indexes = squad_metrics._get_best_indexes(end_logits, n_best_size=41)
         print("start_indexes", start_indexes)
         print("end_indexes", end_indexes)
 
