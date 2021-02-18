@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import numpy as np
 
 class Candid_rep():
 
@@ -17,7 +17,7 @@ class Candid_rep():
         self.wv = nn.Linear(768, 1, bias=False)
 
     # TODO adapt this to the model
-    def calculate_candidate_representations(self, S_p, spans):
+    def calculate_candidate_representations(self, spans, features):
         '''
         Given the candidate spans and the passages, extracts the candidates,
         calculates the condensed vector representation r_c, forms a
@@ -27,6 +27,7 @@ class Candid_rep():
         '''
         self.S_p = S_p
         self.spans = spans
+        self.features = features
         self.M = spans.shape[0] * self.k  # num_passages * num_candidates
         self.S_Cs, self.r_Cs = self.calculate_condensed_vector_representation()
         self.V = self.calculate_correlations()
@@ -40,9 +41,9 @@ class Candid_rep():
         S_Cs = []
         r_Cs = []
         encoded_candidates = []
-        start_indices = self.spans[:, :, 0]
-        end_indices = self.spans[:, :, 1]
-        max_seq_len = self.S_p.shape[1]  # padding length
+        start_indices = self.spans[0]
+        end_indices = self.spans[1]
+
 
         for p in range(self.S_p.shape[0]):
             # Iterate through the candidates per passage
@@ -57,9 +58,11 @@ class Candid_rep():
                 '''
                 c = self.S_p[p][start_indices[p][i]:end_indices[p][i] + 1]
                 c_len = c.shape[0]
-                num_start_pads = start_indices[p][i]
-                num_end_pads = max_seq_len - num_start_pads - c_len
-                S_C = F.pad(input=c, pad=(0, 0, num_start_pads, num_end_pads), mode='constant', value=0)
+                ans_id = self.features.input_ids[i][start_indices[i]:end_indices[i]]
+                enc_vector = np.zeros(256)
+                enc_vector[start_indices[i]:end_indices[i]] = ans_id # TODO check for array
+
+                S_C = enc_vector
                 S_Cs.append(S_C)
                 # Condensed Vector Representation
                 r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()

@@ -97,12 +97,14 @@ class ODQAModel(BertForQuestionAnswering):
         end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=41)
         print("start_indexes", start_indexes)
         print("end_indexes", end_indexes)
-
-        if not return_dict:
-            print("NOT RETURN DICT")
-            output = (start_logits, end_logits) + outputs[2:]
-            print(output)
-            return ((total_loss,) + output) if total_loss is not None else output
+        candidate_spans=(start_indexes,end_indexes)
+        feat = self.features
+        # spans in the original is structured like [passages, number of candidates, span of the answer]
+        self.candidate_representation.calculate_candidate_representations(spans=candidate_spans, features=feat) # TODO take care of Sp remains
+        S_Cs = self.candidate_representation.S_Cs  # [200, 100, 200]
+        r_Cs = self.candidate_representation.r_Cs  # [200, 100]
+        r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
+        encoded_candidates = self.candidate_representation.encoded_candidates
 
         #predictions_dict, ODQA_predictions_list = postprocess_qa_predictions(examples=self.examples,
          #                                             features=self.features,
@@ -122,6 +124,10 @@ class ODQAModel(BertForQuestionAnswering):
         #print("candidate_spans_list",candidate_spans_list,"\n")
         #candidate_spans = torch.stack(candidate_spans_list, dim=0)
         #print("candidate_spans",candidate_spans,"\n")
+
+        if not return_dict:
+            output = (start_logits, end_logits) + outputs[2:]
+            return ((total_loss,) + output) if total_loss is not None else output
         return QuestionAnsweringModelOutput(
             loss=total_loss,
             start_logits=start_logits,
@@ -129,13 +135,6 @@ class ODQAModel(BertForQuestionAnswering):
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
-        # spans in the original is structured like [passages, number of candidates, span of the answer]
-        self.candidate_representation.calculate_candidate_representations(S_p=S_p, spans=candidate_spans)
-        S_Cs = self.candidate_representation.S_Cs  # [200, 100, 200]
-        r_Cs = self.candidate_representation.r_Cs  # [200, 100]
-        r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
-        encoded_candidates = self.candidate_representation.encoded_candidates
-
 
     def get_examples_and_features(self, examples, features):
         self.features = features
