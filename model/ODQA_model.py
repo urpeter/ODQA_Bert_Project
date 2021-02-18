@@ -86,14 +86,14 @@ class ODQAModel(BertForQuestionAnswering):
             start_positions.clamp_(0, ignored_index)
             end_positions.clamp_(0, ignored_index)
 
-            loss_fct = CrossEntropyLoss()#(ignore_index=ignored_index)
+            loss_fct = CrossEntropyLoss(ignore_index=ignored_index)
             start_loss = loss_fct(start_logits, start_positions)
             end_loss = loss_fct(end_logits, end_positions)
             total_loss = (start_loss + end_loss) / 2
         print("first line", start_logits[1])
-        #print("start_logits",list(enumerate(start_logits)), len(list(enumerate(start_logits))))
+        print("start_logits",list(enumerate(start_logits)), len(list(enumerate(start_logits))))
 
-        start_indexes = squad_metrics._get_best_indexes(start_logits, n_best_size=41)
+        start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=41)
         end_indexes = squad_metrics._get_best_indexes(end_logits, n_best_size=41)
         print("start_indexes", start_indexes)
         print("end_indexes", end_indexes)
