@@ -49,8 +49,8 @@ class Candid_rep():
             # Iterate through the candidates per passage
             for i in range(self.k):
                 # Start and end tokens of candidate
-                sp_cb = np.asarray(start_indices[p]) # Candidate Nr. i start
-                sp_ce = np.asarray(end_indices[p])  # Candidate Nr. i end
+                sp_cb = torch.tensor(start_indices[p]) # Candidate Nr. i start
+                sp_ce = torch.tensor(end_indices[p])  # Candidate Nr. i end
                 print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
                 '''
                 Full dimensional candidate
