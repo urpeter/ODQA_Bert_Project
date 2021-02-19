@@ -25,7 +25,7 @@ class Candid_rep():
         a fused representation tilda_r_Cs to represent how each candidate is
         affected by each other candidate.
         '''
-        self.S_p = features.input_ids
+        self.S_p = features
         self.spans = spans
         self.features = features
         self.M = spans.shape[0] * self.k  # num_passages * num_candidates
@@ -43,7 +43,7 @@ class Candid_rep():
         encoded_candidates = []
         start_indices = self.spans[0]
         end_indices = self.spans[1]
-
+        print("Start ind:", start_indices, "\n End ind:", end_indices,"\n")
 
         for p in range(self.S_p.shape[0]):
             # Iterate through the candidates per passage
@@ -51,21 +51,25 @@ class Candid_rep():
                 # Start and end tokens of candidate
                 sp_cb = self.S_p[p][start_indices[p][i]]  # Candidate Nr. i start
                 sp_ce = self.S_p[p][end_indices[p][i]]  # Candidate Nr. i end
+                print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
                 '''
                 Full dimensional candidate
                 Pad candidate to full length, but keep position relative to full passage
                 Example p=[a,b,c,d], c=[b,c] => S_C=[0,b,c,0]
                 '''
-                c = self.S_p[p][start_indices[p][i]:end_indices[p][i] + 1]
-                c_len = c.shape[0]
+                #c = self.S_p[p][start_indices[p][i]:end_indices[p][i] + 1]
+                #c_len = c.shape[0]
+
                 ans_id = self.features.input_ids[i][start_indices[i]:end_indices[i]]
                 enc_vector = np.zeros(256, dtype=int)
                 enc_vector[start_indices[i]:end_indices[i]] = ans_id
-
                 S_C = enc_vector
+
                 S_Cs.append(S_C)
+
                 # Condensed Vector Representation
                 r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()
+                print("r_C: ", r_C)
                 r_Cs.append(r_C)
                 # Candidate in encoded form (embedding indices)
                 #enc_c = self.passages[p][start_indices[p][i]:end_indices[p][i] + 1]
