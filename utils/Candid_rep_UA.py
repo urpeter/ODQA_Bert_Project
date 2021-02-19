@@ -49,8 +49,8 @@ class Candid_rep():
             # Iterate through the candidates per passage
             for i in range(self.k):
                 # Start and end tokens of candidate
-                sp_cb = torch.tensor(start_indices[p]) # Candidate Nr. i start
-                sp_ce = torch.tensor(end_indices[p])  # Candidate Nr. i end
+                sp_cb = torch.tensor(np.asarray(start_indices[p])) # Candidate Nr. i start
+                sp_ce = torch.tensor(np.asarray(end_indices[p]))  # Candidate Nr. i end
                 print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
                 '''
                 Full dimensional candidate
@@ -61,10 +61,9 @@ class Candid_rep():
                 #c_len = c.shape[0]
 
                 ans_span = self.features[p].input_ids[start_indices[p]:end_indices[p]]
-                enc_vector = np.zeros(256, dtype=int)
+                enc_vector = np.zeros(256, dtype=int) #maybe use torch.tensor new_zeros
                 enc_vector[start_indices[p]:end_indices[p]] = ans_span
-                S_C = enc_vector
-
+                S_C = torch.tensor(enc_vector)
                 S_Cs.append(S_C)
 
                 # Condensed Vector Representation
