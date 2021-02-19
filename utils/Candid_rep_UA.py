@@ -59,9 +59,8 @@ class Candid_rep():
                 c = self.S_p[p][start_indices[p][i]:end_indices[p][i] + 1]
                 c_len = c.shape[0]
                 ans_id = self.features.input_ids[i][start_indices[i]:end_indices[i]]
-                enc_vector = np.zeros(256)
-                enc_vector[start_indices[i]:end_indices[i]] = ans_id # TODO check
-                                                                     # for array
+                enc_vector = np.zeros(256, dtype=int)
+                enc_vector[start_indices[i]:end_indices[i]] = ans_id
 
                 S_C = enc_vector
                 S_Cs.append(S_C)
