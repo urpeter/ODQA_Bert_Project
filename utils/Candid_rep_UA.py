@@ -49,8 +49,8 @@ class Candid_rep():
             # Iterate through the candidates per passage
             for i in range(self.k):
                 # Start and end tokens of candidate
-                sp_cb = self.S_p[p][start_indices[p][i]]  # Candidate Nr. i start
-                sp_ce = self.S_p[p][end_indices[p][i]]  # Candidate Nr. i end
+                sp_cb = self.S_p[p][start_indices[p]]  # Candidate Nr. i start
+                sp_ce = self.S_p[p][end_indices[p]]  # Candidate Nr. i end
                 print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
                 '''
                 Full dimensional candidate
@@ -60,9 +60,9 @@ class Candid_rep():
                 #c = self.S_p[p][start_indices[p][i]:end_indices[p][i] + 1]
                 #c_len = c.shape[0]
 
-                ans_id = self.features.input_ids[i][start_indices[i]:end_indices[i]]
+                ans_id = self.features.input_ids[p][start_indices[p]:end_indices[p]]
                 enc_vector = np.zeros(256, dtype=int)
-                enc_vector[start_indices[i]:end_indices[i]] = ans_id
+                enc_vector[start_indices[p]:end_indices[p]] = ans_id
                 S_C = enc_vector
 
                 S_Cs.append(S_C)
