@@ -68,7 +68,7 @@ class Candid_rep():
                 S_Cs.append(S_C)
 
                 # Condensed Vector Representation
-                r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()
+                r_C = (torch.add(self.wb(sp_cb), self.we(sp_ce))).tanh()
                 print("r_C: ", r_C)
                 r_Cs.append(r_C)
                 # Candidate in encoded form (embedding indices)
