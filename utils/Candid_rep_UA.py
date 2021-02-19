@@ -25,7 +25,7 @@ class Candid_rep():
         a fused representation tilda_r_Cs to represent how each candidate is
         affected by each other candidate.
         '''
-        self.S_p = features
+        self.S_p = np.asarray(features)
         self.spans = spans
         self.features = features
         self.M = np.asarray(spans[0]).shape[0] * self.k  # num_passages * num_candidates
