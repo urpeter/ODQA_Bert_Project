@@ -28,7 +28,7 @@ class Candid_rep():
         self.S_p = features
         self.spans = spans
         self.features = features
-        self.M = spans.shape[0] * self.k  # num_passages * num_candidates
+        self.M = np.asarray(spans[0]).shape[0] * self.k  # num_passages * num_candidates
         self.S_Cs, self.r_Cs = self.calculate_condensed_vector_representation()
         self.V = self.calculate_correlations()
         self.tilda_r_Cs = self.generate_fused_representation()
