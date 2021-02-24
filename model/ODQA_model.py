@@ -47,6 +47,7 @@ class ODQAModel(BertForQuestionAnswering):
         end_positions=None,
         return_dict=None,
         output_hidden_states=None,
+        output_attentions=None,
     ):
         r"""
         start_positions (:obj:`torch.LongTensor` of shape :obj:`(batch_size,)`, `optional`):
@@ -97,13 +98,7 @@ class ODQAModel(BertForQuestionAnswering):
             total_loss = (start_loss + end_loss) / 2
         #print("first line", start_logits[1])
         #print("start_logits",list(enumerate(start_logits)), len(list(enumerate(start_logits))))
-        return QuestionAnsweringModelOutput(
-            loss=total_loss,
-            start_logits=start_logits,
-            end_logits=end_logits,
-            hidden_states=outputs.hidden_states,
-            attentions=outputs.attentions,
-        )
+
         start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=41)
         end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=41)
         print("start_indexes", start_indexes)
@@ -141,6 +136,13 @@ class ODQAModel(BertForQuestionAnswering):
             output = (start_logits, end_logits) + outputs[2:]
             return ((total_loss,) + output) if total_loss is not None else output
 
+        return QuestionAnsweringModelOutput(
+            loss=total_loss,
+            start_logits=start_logits,
+            end_logits=end_logits,
+            hidden_states=outputs.hidden_states,
+            attentions=outputs.attentions,
+        )
 
     def get_examples_and_features(self, examples, features):
         self.features = features
