@@ -24,7 +24,7 @@ class ODQAModel(BertPreTrainedModel):
 
     def __init__(self, config):
         super().__init__(config)
-
+        self.num_labels = config.num_labels
         self.bert = BertModel(config, add_pooling_layer=False)
 
         self.candidate_representation = Candid_rep(k=82)
