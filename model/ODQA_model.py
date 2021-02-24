@@ -12,21 +12,28 @@ from transformers.file_utils import (
     add_start_docstrings_to_callable)
 from transformers.modeling_outputs import (
     QuestionAnsweringModelOutput)
-from transformers.modeling_bert import BertForQuestionAnswering, BERT_INPUTS_DOCSTRING, _CONFIG_FOR_DOC, \
+from transformers.modeling_bert import BertPreTrainedModel, BERT_INPUTS_DOCSTRING, _CONFIG_FOR_DOC, \
     _TOKENIZER_FOR_DOC, BertModel
 from utils.Candid_rep_UA import Candid_rep
 from utils.qa_utils import postprocess_qa_predictions
 from transformers.data.metrics import squad_metrics
 
-class ODQAModel(BertForQuestionAnswering):
+class ODQAModel(BertPreTrainedModel):
+
+    authorized_unexpected_keys = [r"pooler"]
 
     def __init__(self, config):
         super().__init__(config)
 
+        self.bert = BertModel(config, add_pooling_layer=False)
+
         self.candidate_representation = Candid_rep(k=82)
+        self.qa_outputs = nn.Linear(config.hidden_size, config.num_labels)
+
         self.examples = None
         self.features = None
 
+        self.init_weights()
     @add_start_docstrings_to_callable(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
     @add_code_sample_docstrings(
         tokenizer_class=_TOKENIZER_FOR_DOC,
@@ -68,6 +75,8 @@ class ODQAModel(BertForQuestionAnswering):
         )
 
         sequence_output = outputs[0]
+        print("sequence output",sequence_output)
+        print("2nd element outputs",outputs[1])
         print("hidden states", outputs.hidden_states)
         logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
