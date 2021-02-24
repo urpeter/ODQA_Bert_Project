@@ -70,7 +70,7 @@ class ODQAModel(BertForQuestionAnswering):
         )
 
         sequence_output = outputs[0]
-        print("sequence output",sequence_output)
+        print("Length of Outputs",len(outputs))
         print("2nd element outputs",outputs[1])
         print("hidden states", outputs.hidden_states)
         logits = self.qa_outputs(sequence_output)
