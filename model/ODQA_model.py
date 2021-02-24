@@ -12,24 +12,19 @@ from transformers.file_utils import (
     add_start_docstrings_to_callable)
 from transformers.modeling_outputs import (
     QuestionAnsweringModelOutput)
-from transformers.modeling_bert import BertPreTrainedModel, BERT_INPUTS_DOCSTRING, _CONFIG_FOR_DOC, \
+from transformers.modeling_bert import BertForQuestionAnswering, BERT_INPUTS_DOCSTRING, _CONFIG_FOR_DOC, \
     _TOKENIZER_FOR_DOC, BertModel
 from utils.Candid_rep_UA import Candid_rep
 from utils.qa_utils import postprocess_qa_predictions
 from transformers.data.metrics import squad_metrics
 
-class ODQAModel(BertPreTrainedModel):
-
-    authorized_unexpected_keys = [r"pooler"]
+class ODQAModel(BertForQuestionAnswering):
 
     def __init__(self, config):
         super().__init__(config)
-        self.num_labels = config.num_labels
-        self.bert = BertModel(config, add_pooling_layer=False)
 
         self.candidate_representation = Candid_rep(k=82)
         self.qa_outputs = nn.Linear(config.hidden_size, config.num_labels)
-
         self.examples = None
         self.features = None
 
