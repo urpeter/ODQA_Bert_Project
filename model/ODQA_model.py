@@ -66,7 +66,7 @@ class ODQAModel(BertForQuestionAnswering):
         )
 
         sequence_output = outputs[0]
-
+        print("hidden states", outputs.hidden_states)
         logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1)
@@ -99,6 +99,7 @@ class ODQAModel(BertForQuestionAnswering):
         print("end_indexes", end_indexes)
         candidate_spans=(start_indexes,end_indexes)
         feat = self.features
+
         # spans in the original is structured like [passages, number of candidates, span of the answer]
         self.candidate_representation.calculate_candidate_representations(spans=candidate_spans, features=feat) # TODO take care of Sp remains
         S_Cs = self.candidate_representation.S_Cs  # [200, 100, 200]

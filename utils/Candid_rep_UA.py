@@ -71,6 +71,9 @@ class Candid_rep():
                 print("Added: ",torch.add(self.wb(sp_cb), self.we(sp_ce)))
                 r_C = (torch.add(self.wb(sp_cb), self.we(sp_ce))).tanh()
                 print("r_C: ", r_C)
+                # Try to trace in the hidden states/ encoded passages bzw sequence output
+                # and put those into the linear layers wb_sp previously we used the index and not the 768
+                #
                 r_Cs.append(r_C)
                 # Candidate in encoded form (embedding indices)
                 #enc_c = self.passages[p][start_indices[p][i]:end_indices[p][i] + 1]
