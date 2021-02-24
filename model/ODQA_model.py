@@ -44,6 +44,7 @@ class ODQAModel(BertForQuestionAnswering):
         start_positions=None,
         end_positions=None,
         return_dict=None,
+        output_hidden_states=None,
     ):
         r"""
         start_positions (:obj:`torch.LongTensor` of shape :obj:`(batch_size,)`, `optional`):
@@ -62,6 +63,7 @@ class ODQAModel(BertForQuestionAnswering):
             attention_mask=attention_mask,
             token_type_ids=token_type_ids,
             position_ids=position_ids,
+            output_hidden_states=output_hidden_states,
             return_dict=return_dict,
         )
 
