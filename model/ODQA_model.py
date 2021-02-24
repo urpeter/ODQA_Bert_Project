@@ -70,9 +70,9 @@ class ODQAModel(BertForQuestionAnswering):
         )
 
         sequence_output = outputs[0]
-        print("Length of Outputs",len(outputs))
+        print("Length of SeqOutputs",len(sequence_output))
         print("2nd element outputs",outputs[1])
-        print("hidden states", outputs.hidden_states)
+        #print("hidden states", outputs.hidden_states)
         logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1)
@@ -98,7 +98,13 @@ class ODQAModel(BertForQuestionAnswering):
             total_loss = (start_loss + end_loss) / 2
         #print("first line", start_logits[1])
         #print("start_logits",list(enumerate(start_logits)), len(list(enumerate(start_logits))))
-
+        return QuestionAnsweringModelOutput(
+            loss=total_loss,
+            start_logits=start_logits,
+            end_logits=end_logits,
+            hidden_states=outputs.hidden_states,
+            attentions=outputs.attentions,
+        )
         start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=41)
         end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=41)
         print("start_indexes", start_indexes)
@@ -135,13 +141,7 @@ class ODQAModel(BertForQuestionAnswering):
         if not return_dict:
             output = (start_logits, end_logits) + outputs[2:]
             return ((total_loss,) + output) if total_loss is not None else output
-        return QuestionAnsweringModelOutput(
-            loss=total_loss,
-            start_logits=start_logits,
-            end_logits=end_logits,
-            hidden_states=outputs.hidden_states,
-            attentions=outputs.attentions,
-        )
+
 
     def get_examples_and_features(self, examples, features):
         self.features = features
