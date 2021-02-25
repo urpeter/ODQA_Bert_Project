@@ -202,7 +202,7 @@ def train(args, batch_dataset, model, tokenizer):
                     "end_positions": batch[4],
                 }
 
-                output = model(**inputs)
+                output = model(**inputs, output_hidden_states=True)
                 outputs.append(output)
 
                 # model outputs are always tuple in transformers (see doc)
