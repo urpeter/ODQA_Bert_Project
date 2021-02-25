@@ -75,7 +75,7 @@ class ODQAModel(BertForQuestionAnswering):
         print("Hidden states:", outputs[2], "\n")
         print("Hidden states type 1. elem:", type(outputs[2][0]), "\n")
         print("Hidden states first elem:", outputs[2][0].shape, "\n")
-        print("Hidden states first elem, 3rd elem", outputs[2][0][3].shape, "\n")
+        # print("Hidden states first elem, 3rd elem", outputs[2][0][3].shape, "\n")
         logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1)
@@ -106,12 +106,14 @@ class ODQAModel(BertForQuestionAnswering):
         end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=41)
         print("start_indexes", start_indexes)
         print("end_indexes", end_indexes)
-        candidate_spans=(start_indexes,end_indexes)
+        candidate_spans = (start_indexes,end_indexes)
         feat = self.features
-
+        #self.candidate_representation.get_hidden_states(outputs[3])
         # spans in the original is structured like [passages, number of candidates, span of the answer]
-        self.candidate_representation.calculate_candidate_representations(spans=candidate_spans, features=feat) # TODO take care of Sp remains
-        S_Cs = self.candidate_representation.S_Cs  # [200, 100, 200]
+        self.candidate_representation.calculate_candidate_representations(spans=candidate_spans,
+                                                                          features=feat,
+                                                                          hidden=outputs[3])
+
         r_Cs = self.candidate_representation.r_Cs  # [200, 100]
         r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
         encoded_candidates = self.candidate_representation.encoded_candidates

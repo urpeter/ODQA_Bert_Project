@@ -15,9 +15,10 @@ class Candid_rep():
         self.wc = nn.Linear(256, 256, bias=False)
         self.wo = nn.Linear(256, 256, bias=False)
         self.wv = nn.Linear(256, 1, bias=False)
+        # self.hidden_states = None
 
     # TODO adapt this to the model
-    def calculate_candidate_representations(self, spans, features):
+    def calculate_candidate_representations(self, spans, features, hidden):
         '''
         Given the candidate spans and the passages, extracts the candidates,
         calculates the condensed vector representation r_c, forms a
@@ -25,7 +26,7 @@ class Candid_rep():
         a fused representation tilda_r_Cs to represent how each candidate is
         affected by each other candidate.
         '''
-        self.S_p = np.asarray(features)
+        self.S_p = hidden
         self.spans = spans
         self.features = features
         self.M = np.asarray(spans[0]).shape[0] * self.k  # num_passages * num_candidates
@@ -38,7 +39,7 @@ class Candid_rep():
         Returns the condensed vector representation of all candidates by condensing their start and end tokens.
         :return:
         '''
-        S_Cs = torch.tensor([])
+        S_Cs = []
         r_Cs = []
         encoded_candidates = []
         start_indices = self.spans[0]
@@ -57,16 +58,26 @@ class Candid_rep():
                 Pad candidate to full length, but keep position relative to full passage
                 Example p=[a,b,c,d], c=[b,c] => S_C=[0,b,c,0]
                 '''
-                #c = self.S_p[p][start_indices[p][i]:end_indices[p][i] + 1]
-                #c_len = c.shape[0]
+                c = (self.S_p[p][start_indices[p]:end_indices[p]])
+                c_len = c.shape[0]
+                num_start_pads = start_indices[p]
+                num_end_pads = 256 - num_start_pads - c_len
+                S_C = F.pad(input=c, pad=(0, 0, num_start_pads, num_end_pads), mode='constant', value=0)
+                S_Cs.append(S_C)
+                # Condensed Vector Representation
+                r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()
+                r_Cs.append(r_C)
+                # Candidate in encoded form (embedding indices)
+                enc_c = self.S_p[p][start_indices[p][i]:end_indices[p][i] + 1]
+                pad_enc_c = F.pad(input=enc_c, pad=(0, 256 - c_len), mode='constant', value=0)
+                encoded_candidates.append(pad_enc_c)
 
 
-                ans_span = self.features[p].input_ids[start_indices[p]:end_indices[p]]
-                spans = torch.tensor((), dtype=torch.int64)
-                spans.new_zeros((256, 1)) #maybe use torch.tensor new_zeros
-                spans = ans_span
-                S_C = torch.stack([spans])
-                S_Cs = torch.stack([S_Cs,S_C])
+                # spans = torch.tensor((), dtype=torch.int64)
+                # spans.new_zeros((256, 1)) #maybe use torch.tensor new_zeros
+                # spans = ans_span
+                # S_C = torch.stack([spans])
+                # S_Cs = torch.stack([S_Cs,S_C])
 
                 # Condensed Vector Representation
                 print("wb_sp_cb",self.wb(sp_cb),"we_sp_ce ", self.we(sp_ce))
@@ -128,3 +139,4 @@ class Candid_rep():
             tilda_rcms.append(tilda_rcm)
 
         return torch.stack(tilda_rcms, dim=0)  # (200x1x100)
+
