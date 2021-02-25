@@ -108,11 +108,11 @@ class ODQAModel(BertForQuestionAnswering):
         print("end_indexes", end_indexes)
         candidate_spans = (start_indexes,end_indexes)
         feat = self.features
-        #self.candidate_representation.get_hidden_states(outputs[3])
+        #self.candidate_representation.get_hidden_states(outputs[2])
         # spans in the original is structured like [passages, number of candidates, span of the answer]
         self.candidate_representation.calculate_candidate_representations(spans=candidate_spans,
                                                                           features=feat,
-                                                                          hidden=outputs[3])
+                                                                          hidden=outputs[2])
 
         r_Cs = self.candidate_representation.r_Cs  # [200, 100]
         r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
