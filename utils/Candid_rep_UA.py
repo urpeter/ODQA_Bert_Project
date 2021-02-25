@@ -46,7 +46,7 @@ class Candid_rep():
         end_indices = self.spans[1]
         print("Start ind:", start_indices, "\n End ind:", end_indices,"\n")
 
-        for p in range(self.S_p.shape[0]):
+        for p in range(self.S_p[0]):
             # Iterate through the candidates per passage
             for i in range(self.k):
                 # Start and end tokens of candidate
