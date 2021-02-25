@@ -23,7 +23,7 @@ class ODQAModel(BertForQuestionAnswering):
     def __init__(self, config):
         super().__init__(config)
 
-        self.candidate_representation = Candid_rep(k=82)
+        self.candidate_representation = Candid_rep(k=41)
         self.qa_outputs = nn.Linear(config.hidden_size, config.num_labels)
         self.examples = None
         self.features = None
@@ -75,7 +75,7 @@ class ODQAModel(BertForQuestionAnswering):
         print("Hidden states:", outputs[2], "\n")
         print("Hidden states type 1. elem:", type(outputs[2][0]), "\n")
         print("Hidden states first elem:", outputs[2][0].shape, "\n")
-
+        print("Hidden states first elem, 3rd elem", outputs[2][0][3].shape, "\n")
         logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1)

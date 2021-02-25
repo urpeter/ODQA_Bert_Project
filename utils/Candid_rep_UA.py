@@ -8,13 +8,13 @@ class Candid_rep():
     def __init__(self, k=1):
         super(Candid_rep, self).__init__()
         self.k = k
-        self.wb = nn.Linear(768, 768, bias=False)
-        self.we = nn.Linear(768, 768, bias=False)
+        self.wb = nn.Linear(768, 256, bias=False)
+        self.we = nn.Linear(768, 256, bias=False)
         # Linear transformations to capture the intensity
         # of each interaction (used for the attention mechanism)
-        self.wc = nn.Linear(768, 768, bias=False)
-        self.wo = nn.Linear(768, 768, bias=False)
-        self.wv = nn.Linear(768, 1, bias=False)
+        self.wc = nn.Linear(256, 256, bias=False)
+        self.wo = nn.Linear(256, 256, bias=False)
+        self.wv = nn.Linear(256, 1, bias=False)
 
     # TODO adapt this to the model
     def calculate_candidate_representations(self, spans, features):
@@ -38,7 +38,7 @@ class Candid_rep():
         Returns the condensed vector representation of all candidates by condensing their start and end tokens.
         :return:
         '''
-        S_Cs = []
+        S_Cs = torch.tensor([])
         r_Cs = []
         encoded_candidates = []
         start_indices = self.spans[0]
@@ -60,11 +60,13 @@ class Candid_rep():
                 #c = self.S_p[p][start_indices[p][i]:end_indices[p][i] + 1]
                 #c_len = c.shape[0]
 
+
                 ans_span = self.features[p].input_ids[start_indices[p]:end_indices[p]]
-                enc_vector = np.zeros(256, dtype=int) #maybe use torch.tensor new_zeros
-                enc_vector[start_indices[p]:end_indices[p]] = ans_span
-                S_C = torch.tensor(enc_vector)
-                S_Cs.append(S_C)
+                spans = torch.tensor((), dtype=torch.int64)
+                spans.new_zeros((256, 1)) #maybe use torch.tensor new_zeros
+                spans = ans_span
+                S_C = torch.stack([spans])
+                S_Cs = torch.stack([S_Cs,S_C])
 
                 # Condensed Vector Representation
                 print("wb_sp_cb",self.wb(sp_cb),"we_sp_ce ", self.we(sp_ce))
