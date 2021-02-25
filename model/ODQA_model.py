@@ -71,9 +71,9 @@ class ODQAModel(BertForQuestionAnswering):
         )
 
         sequence_output = outputs[0]
-        print("Length of SeqOutputs",len(sequence_output))
-        print("Hidden states Lenge:", len(outputs[2]), "\n")
-        print("Hidden states:", outputs[2].shape(), "\n")
+        print("Length of SeqOutputs",len(sequence_output), "\n")
+        print("Hidden states Lenge:", type(outputs[2]), "\n")
+        print("Hidden states:", outputs[2].size(), "\n")
 
         logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
