@@ -64,9 +64,10 @@ class Candid_rep():
                 num_end_pads = 256 - num_start_pads - c_len
                 S_C = F.pad(input=c, pad=(0, 0, num_start_pads, num_end_pads), mode='constant', value=0)
                 S_Cs.append(S_C)
-                print("sp_cb shape", sp_cb.shape[0], "sp_ce shape",sp_ce.shape[0])
-                print("sp_cb type ", sp_cb.type, "sp_ce type ", sp_ce.type)
-                print("sp_cb zero elem", sp_cb[0], "sp_ce zero elem", sp_ce[0])
+                # currently we get tensor([7]) and tensor([22]) so we create a tensor out of the start and end indices, this is wrong
+                print("sp_cb shape", sp_cb.shape[0], "sp_ce shape",sp_ce.shape[0], "\n")
+                print("sp_cb type ", sp_cb.type, "sp_ce type ", sp_ce.type, "\n")
+                print("sp_cb zero elem", sp_cb[0], "sp_ce zero elem", sp_ce[0], "\n")
 
                 # Condensed Vector Representation
                 r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()

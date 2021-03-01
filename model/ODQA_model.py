@@ -72,7 +72,6 @@ class ODQAModel(BertForQuestionAnswering):
 
         sequence_output = outputs[0]
         print("Length of SeqOutputs",len(sequence_output), "\n")
-        print("Hidden states:", outputs[2], "\n")
         print("Hidden states type 1. elem:", type(outputs[2][0]), "\n")
         print("Hidden states first elem:", outputs[2][0].shape, "\n")
         # print("Hidden states first elem, 3rd elem", outputs[2][0][3].shape, "\n")
@@ -104,11 +103,9 @@ class ODQAModel(BertForQuestionAnswering):
 
         start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=41)
         end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=41)
-        print("start_indexes", start_indexes)
-        print("end_indexes", end_indexes)
         candidate_spans = (start_indexes,end_indexes)
         feat = self.features
-        #self.candidate_representation.get_hidden_states(outputs[2])
+
         # spans in the original is structured like [passages, number of candidates, span of the answer]
         self.candidate_representation.calculate_candidate_representations(spans=candidate_spans,
                                                                           features=feat,
