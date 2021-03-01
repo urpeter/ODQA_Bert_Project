@@ -80,6 +80,11 @@ class Candid_rep():
                 # S_Cs = torch.stack([S_Cs,S_C])
 
                 # Condensed Vector Representation
+                print("sp_cb", sp_cb.shape)
+                print("wb_sp_cb", self.wb(sp_cb))
+                print("sp_ce", sp_ce.shape)
+                print("wb_sp_ce", self.wb(sp_ce))
+
                 print("wb_sp_cb",self.wb(sp_cb),"we_sp_ce ", self.we(sp_ce))
                 print("Added: ",torch.add(self.wb(sp_cb), self.we(sp_ce)))
                 r_C = (torch.add(self.wb(sp_cb), self.we(sp_ce))).tanh()
