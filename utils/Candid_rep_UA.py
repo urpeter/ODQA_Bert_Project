@@ -64,7 +64,9 @@ class Candid_rep():
                 num_end_pads = 256 - num_start_pads - c_len
                 S_C = F.pad(input=c, pad=(0, 0, num_start_pads, num_end_pads), mode='constant', value=0)
                 S_Cs.append(S_C)
-                print("sp_cb", sp_cb.shape)
+                print("sp_cb shape", sp_cb.shape[0])
+                print("sp_cb type ", sp_cb.type)
+                print("sp_cb zero elem", sp_cb[0])
                 print("wb_sp_cb", self.wb(sp_cb))
                 print("sp_ce", sp_ce.shape)
                 print("wb_sp_ce", self.wb(sp_ce))
