@@ -52,7 +52,7 @@ class Candid_rep():
                 # Start and end tokens of candidate
                 sp_cb = torch.tensor(np.asarray([start_indices[p]])) # Candidate Nr. i start
                 sp_ce = torch.tensor(np.asarray([end_indices[p]]))  # Candidate Nr. i end
-                print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
+                #print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
                 '''
                 Full dimensional candidate
                 Pad candidate to full length, but keep position relative to full passage
@@ -69,7 +69,7 @@ class Candid_rep():
                 print("sp_ce", sp_ce.shape)
                 print("wb_sp_ce", self.wb(sp_ce))
 
-                print("wb_sp_cb", self.wb(sp_cb), "we_sp_ce ", self.we(sp_ce))
+
                 # Condensed Vector Representation
                 r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()
                 r_Cs.append(r_C)
