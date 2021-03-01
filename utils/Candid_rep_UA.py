@@ -64,6 +64,12 @@ class Candid_rep():
                 num_end_pads = 256 - num_start_pads - c_len
                 S_C = F.pad(input=c, pad=(0, 0, num_start_pads, num_end_pads), mode='constant', value=0)
                 S_Cs.append(S_C)
+                print("sp_cb", sp_cb.shape)
+                print("wb_sp_cb", self.wb(sp_cb))
+                print("sp_ce", sp_ce.shape)
+                print("wb_sp_ce", self.wb(sp_ce))
+
+                print("wb_sp_cb", self.wb(sp_cb), "we_sp_ce ", self.we(sp_ce))
                 # Condensed Vector Representation
                 r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()
                 r_Cs.append(r_C)
@@ -80,12 +86,7 @@ class Candid_rep():
                 # S_Cs = torch.stack([S_Cs,S_C])
 
                 # Condensed Vector Representation
-                print("sp_cb", sp_cb.shape)
-                print("wb_sp_cb", self.wb(sp_cb))
-                print("sp_ce", sp_ce.shape)
-                print("wb_sp_ce", self.wb(sp_ce))
 
-                print("wb_sp_cb",self.wb(sp_cb),"we_sp_ce ", self.we(sp_ce))
                 print("Added: ",torch.add(self.wb(sp_cb), self.we(sp_ce)))
                 r_C = (torch.add(self.wb(sp_cb), self.we(sp_ce))).tanh()
                 print("r_C: ", r_C)
