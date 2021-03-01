@@ -71,7 +71,7 @@ class ODQAModel(BertForQuestionAnswering):
         )
 
         sequence_output = outputs[0]
-        print("Length of SeqOutputs",len(sequence_output), "\n")
+        print("\n", "Length of Outputs 2",outputs[2], "\n")
         print("Hidden states type 1. elem:", type(outputs[2][0]), "\n")
         print("Hidden states first elem:", outputs[2][0].shape, "\n")
         # print("Hidden states first elem, 3rd elem", outputs[2][0][3].shape, "\n")
