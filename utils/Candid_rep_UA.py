@@ -49,12 +49,13 @@ class Candid_rep():
         #print("Sequence_Output_len", len(self.S_p), "Shape ", self.S_p.shape[0], "\n")
 
         for p in range(self.S_p[0].shape[0]):
-            #print("P", self.S_p[p].shape)
+            print(p)
             # Iterate through the candidates per passage
 
             # Start and end tokens of candidate
             sp_cb = self.S_p[p][start_indices[p]]  # Candidate Nr. i start
-            #print("sp_cb", self.S_p[p][start_indices[p]].shape)
+            print(start_indices)
+            print("sp_cb", self.S_p[p][start_indices[p]].shape)
             sp_ce = self.S_p[p][end_indices[p]]  # Candidate Nr. i end
             #print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
             '''
@@ -93,7 +94,7 @@ class Candid_rep():
 
             # Condensed Vector Representation
 
-            print("Added: ",torch.add(self.wb(sp_cb), self.we(sp_ce)))
+            #print("Added: ",torch.add(self.wb(sp_cb), self.we(sp_ce)))
             r_C = (torch.add(self.wb(sp_cb), self.we(sp_ce))).tanh()
             #print("r_C: ", r_C)
             # Try to trace in the hidden states/ encoded passages bzw sequence output
