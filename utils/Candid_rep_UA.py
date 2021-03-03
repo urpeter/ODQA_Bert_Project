@@ -47,16 +47,12 @@ class Candid_rep():
         print("Start ind:", start_indices, "\n End ind:", end_indices, "\n")
         #print("Sequence_Output", self.S_p, "Shape ",self.S_p.shape, "\n")
         #print("Sequence_Output_len", len(self.S_p), "Shape ", self.S_p.shape[0], "\n")
-
-        for p in range(self.S_p[0].shape[0]):
+        print(self.S_p[0].shape)
+        for p in range(self.S_p[0].shape):
             # Iterate through the candidates per passage
 
             # Start and end tokens of candidate
             sp_cb = self.S_p[p][start_indices[p]]  # Candidate Nr. i start
-            print(self.S_p.shape)
-            print(self.S_p[p].shape)
-            print(self.S_p[p][start_indices[p]])
-            break
             sp_ce = self.S_p[p][end_indices[p]]  # Candidate Nr. i end
             #print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
             '''
