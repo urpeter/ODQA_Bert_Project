@@ -15,7 +15,7 @@ class Candid_rep():
         self.wc = nn.Linear(256, 256, bias=False)
         self.wo = nn.Linear(256, 256, bias=False)
         self.wv = nn.Linear(256, 1, bias=False)
-        # self.hidden_states = None
+
 
     # TODO adapt this to the model
     def calculate_candidate_representations(self, spans, features, seq_outpu):
@@ -54,6 +54,8 @@ class Candid_rep():
 
             # Start and end tokens of candidate
             sp_cb = self.S_p[p][start_indices[p]]  # Candidate Nr. i start
+            print("sp_cb", self.S_p[p][start_indices[p]].shape)
+            break
             sp_ce = self.S_p[p][end_indices[p]]  # Candidate Nr. i end
             #print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
             '''
