@@ -66,6 +66,7 @@ class Candid_rep():
             c = (self.S_p[p][start_indices[p]:end_indices[p]])
             c_len = c.shape[0]
             print("clen",c_len)
+            break
             num_start_pads = start_indices[p]
             num_end_pads = 256 - num_start_pads - c_len
             S_C = F.pad(input=c, pad=(0, 0, num_start_pads, num_end_pads), mode='constant', value=0)
