@@ -51,56 +51,56 @@ class Candid_rep():
         for p in range(self.S_p[0].shape[0]):
             print("P", self.S_p[p].shape)
             # Iterate through the candidates per passage
-            for i in range(self.k):
-                # Start and end tokens of candidate
-                sp_cb = self.S_p[p][start_indices[p]]  # Candidate Nr. i start
-                sp_ce = self.S_p[p][end_indices[p]]  # Candidate Nr. i end
-                print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
-                '''
-                Full dimensional candidate
-                Pad candidate to full length, but keep position relative to full passage
-                Example p=[a,b,c,d], c=[b,c] => S_C=[0,b,c,0]
-                '''
-                c = (self.S_p[p][start_indices[p]:end_indices[p]])
-                c_len = c.shape[0]
-                num_start_pads = start_indices[p]
-                num_end_pads = 256 - num_start_pads - c_len
-                S_C = F.pad(input=c, pad=(0, 0, num_start_pads, num_end_pads), mode='constant', value=0)
-                S_Cs.append(S_C)
-                # currently we get tensor([7]) and tensor([22]) so we create a tensor out of the start and end indices, this is wrong we have to use outputs[0] because this grants
 
-                #print("sp_cb shape", sp_cb.shape[0], "sp_ce shape",sp_ce.shape[0], "\n")
-                #print("sp_cb type ", sp_cb.type, "sp_ce type ", sp_ce.type, "\n")
-                #print("sp_cb zero elem", sp_cb[0], "sp_ce zero elem", sp_ce[0], "\n")
+            # Start and end tokens of candidate
+            sp_cb = self.S_p[p][start_indices[p]]  # Candidate Nr. i start
+            sp_ce = self.S_p[p][end_indices[p]]  # Candidate Nr. i end
+            print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
+            '''
+            Full dimensional candidate
+            Pad candidate to full length, but keep position relative to full passage
+            Example p=[a,b,c,d], c=[b,c] => S_C=[0,b,c,0]
+            '''
+            c = (self.S_p[p][start_indices[p]:end_indices[p]])
+            c_len = c.shape[0]
+            num_start_pads = start_indices[p]
+            num_end_pads = 256 - num_start_pads - c_len
+            S_C = F.pad(input=c, pad=(0, 0, num_start_pads, num_end_pads), mode='constant', value=0)
+            S_Cs.append(S_C)
+            # currently we get tensor([7]) and tensor([22]) so we create a tensor out of the start and end indices, this is wrong we have to use outputs[0] because this grants
 
-                # Condensed Vector Representation
-                r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()
-                r_Cs.append(r_C)
-                # Candidate in encoded form (embedding indices)
-                enc_c = self.S_p[p][start_indices[p][i]:end_indices[p][i] + 1]
-                pad_enc_c = F.pad(input=enc_c, pad=(0, 256 - c_len), mode='constant', value=0)
-                encoded_candidates.append(pad_enc_c)
+            #print("sp_cb shape", sp_cb.shape[0], "sp_ce shape",sp_ce.shape[0], "\n")
+            #print("sp_cb type ", sp_cb.type, "sp_ce type ", sp_ce.type, "\n")
+            #print("sp_cb zero elem", sp_cb[0], "sp_ce zero elem", sp_ce[0], "\n")
+
+            # Condensed Vector Representation
+            r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()
+            r_Cs.append(r_C)
+            # Candidate in encoded form (embedding indices)
+            enc_c = self.S_p[p][start_indices[p][i]:end_indices[p][i] + 1]
+            pad_enc_c = F.pad(input=enc_c, pad=(0, 256 - c_len), mode='constant', value=0)
+            encoded_candidates.append(pad_enc_c)
 
 
-                # spans = torch.tensor((), dtype=torch.int64)
-                # spans.new_zeros((256, 1)) #maybe use torch.tensor new_zeros
-                # spans = ans_span
-                # S_C = torch.stack([spans])
-                # S_Cs = torch.stack([S_Cs,S_C])
+            # spans = torch.tensor((), dtype=torch.int64)
+            # spans.new_zeros((256, 1)) #maybe use torch.tensor new_zeros
+            # spans = ans_span
+            # S_C = torch.stack([spans])
+            # S_Cs = torch.stack([S_Cs,S_C])
 
-                # Condensed Vector Representation
+            # Condensed Vector Representation
 
-                print("Added: ",torch.add(self.wb(sp_cb), self.we(sp_ce)))
-                r_C = (torch.add(self.wb(sp_cb), self.we(sp_ce))).tanh()
-                print("r_C: ", r_C)
-                # Try to trace in the hidden states/ encoded passages bzw sequence output
-                # and put those into the linear layers wb_sp previously we used the index and not the 768
-                #
-                r_Cs.append(r_C)
-                # Candidate in encoded form (embedding indices)
-                #enc_c = self.passages[p][start_indices[p][i]:end_indices[p][i] + 1]
-                #pad_enc_c = F.pad(input=enc_c, pad=(0, max_seq_len - c_len), mode='constant', value=0)
-                #encoded_candidates.append(pad_enc_c)
+            print("Added: ",torch.add(self.wb(sp_cb), self.we(sp_ce)))
+            r_C = (torch.add(self.wb(sp_cb), self.we(sp_ce))).tanh()
+            print("r_C: ", r_C)
+            # Try to trace in the hidden states/ encoded passages bzw sequence output
+            # and put those into the linear layers wb_sp previously we used the index and not the 768
+            #
+            r_Cs.append(r_C)
+            # Candidate in encoded form (embedding indices)
+            #enc_c = self.passages[p][start_indices[p][i]:end_indices[p][i] + 1]
+            #pad_enc_c = F.pad(input=enc_c, pad=(0, max_seq_len - c_len), mode='constant', value=0)
+            #encoded_candidates.append(pad_enc_c)
 
         # Stack to turn into tensor
         S_Cs = torch.stack(S_Cs, dim=0)

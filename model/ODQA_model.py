@@ -97,8 +97,8 @@ class ODQAModel(BertForQuestionAnswering):
         #print("first line", start_logits[1])
         #print("start_logits",list(enumerate(start_logits)), len(list(enumerate(start_logits))))
 
-        start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=41)
-        end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=41)
+        start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=256)
+        end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=256)
         candidate_spans = (start_indexes,end_indexes)
         feat = self.features
 
