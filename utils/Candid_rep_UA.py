@@ -30,7 +30,7 @@ class Candid_rep():
         self.spans = spans
         self.features = features
         self.M = np.asarray(spans[0]).shape[0] * self.k  # num_passages * num_candidates
-        self.S_Cs, self.r_Cs = self.calculate_condensed_vector_representation()
+        self.S_Cs, self.r_Cs, self.encoded_candidates = self.calculate_condensed_vector_representation()
         self.V = self.calculate_correlations()
         self.tilda_r_Cs = self.generate_fused_representation()
 
@@ -47,14 +47,14 @@ class Candid_rep():
         print("Start ind:", start_indices, "\n End ind:", end_indices, "\n")
         #print("Sequence_Output", self.S_p, "Shape ",self.S_p.shape, "\n")
         #print("Sequence_Output_len", len(self.S_p), "Shape ", self.S_p.shape[0], "\n")
-        print("S_P.shape", self.S_p.shape[0])
+        #print("S_P.shape", self.S_p.shape[0])
         for p in range(self.S_p.shape[0]):
             # Iterate through the candidates per passage
 
             # Start and end tokens of candidate
             sp_cb = self.S_p[p][start_indices[p]]  # Candidate Nr. i start
             sp_ce = self.S_p[p][end_indices[p]]  # Candidate Nr. i end
-            #print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
+
             '''
             Full dimensional candidate
             Pad candidate to full length, but keep position relative to full passage
@@ -68,11 +68,6 @@ class Candid_rep():
             num_end_pads = 256 - num_start_pads - c_len
             S_C = F.pad(input=c, pad=(0, 0, num_start_pads, num_end_pads), mode='constant', value=0)
             S_Cs.append(S_C)
-            # currently we get tensor([7]) and tensor([22]) so we create a tensor out of the start and end indices, this is wrong we have to use outputs[0] because this grants
-
-            #print("sp_cb shape", sp_cb.shape[0], "sp_ce shape",sp_ce.shape[0], "\n")
-            #print("sp_cb type ", sp_cb.type, "sp_ce type ", sp_ce.type, "\n")
-            #print("sp_cb zero elem", sp_cb[0], "sp_ce zero elem", sp_ce[0], "\n")
 
             # Condensed Vector Representation
             r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()
@@ -82,32 +77,11 @@ class Candid_rep():
             pad_enc_c = F.pad(input=enc_c, pad=(0, 256 - c_len), mode='constant', value=0)
             encoded_candidates.append(pad_enc_c)
 
-
-            # spans = torch.tensor((), dtype=torch.int64)
-            # spans.new_zeros((256, 1)) #maybe use torch.tensor new_zeros
-            # spans = ans_span
-            # S_C = torch.stack([spans])
-            # S_Cs = torch.stack([S_Cs,S_C])
-
-            # Condensed Vector Representation
-
-            #print("Added: ",torch.add(self.wb(sp_cb), self.we(sp_ce)))
-            r_C = (torch.add(self.wb(sp_cb), self.we(sp_ce))).tanh()
-            #print("r_C: ", r_C)
-            # Try to trace in the hidden states/ encoded passages bzw sequence output
-            # and put those into the linear layers wb_sp previously we used the index and not the 768
-            #
-            r_Cs.append(r_C)
-            # Candidate in encoded form (embedding indices)
-            #enc_c = self.passages[p][start_indices[p][i]:end_indices[p][i] + 1]
-            #pad_enc_c = F.pad(input=enc_c, pad=(0, max_seq_len - c_len), mode='constant', value=0)
-            #encoded_candidates.append(pad_enc_c)
-
         # Stack to turn into tensor
         S_Cs = torch.stack(S_Cs, dim=0)
         r_Cs = torch.stack(r_Cs, dim=0)
-        #encoded_candidates = torch.stack(encoded_candidates, dim=0)
-        return S_Cs, r_Cs #,encoded_candidates
+        encoded_candidates = torch.stack(encoded_candidates, dim=0)
+        return S_Cs, r_Cs, encoded_candidates
 
     def calculate_correlations(self):
         '''
