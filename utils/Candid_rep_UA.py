@@ -44,17 +44,17 @@ class Candid_rep():
         encoded_candidates = []
         start_indices = self.spans[0]
         end_indices = self.spans[1]
-        #print("Start ind:", start_indices, "\n End ind:", end_indices, "\n")
+        print("Start ind:", start_indices, "\n End ind:", end_indices, "\n")
         #print("Sequence_Output", self.S_p, "Shape ",self.S_p.shape, "\n")
         #print("Sequence_Output_len", len(self.S_p), "Shape ", self.S_p.shape[0], "\n")
 
         for p in range(self.S_p[0].shape[0]):
-            print("P", self.S_p[p])
+            print("P", self.S_p[p].shape)
             # Iterate through the candidates per passage
             for i in range(self.k):
                 # Start and end tokens of candidate
-                sp_cb = torch.tensor(np.asarray([start_indices[p]])) # Candidate Nr. i start
-                sp_ce = torch.tensor(np.asarray([end_indices[p]]))  # Candidate Nr. i end
+                sp_cb = self.S_p[p][start_indices[p]]  # Candidate Nr. i start
+                sp_ce = self.S_p[p][end_indices[p]]  # Candidate Nr. i end
                 print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
                 '''
                 Full dimensional candidate
@@ -68,10 +68,10 @@ class Candid_rep():
                 S_C = F.pad(input=c, pad=(0, 0, num_start_pads, num_end_pads), mode='constant', value=0)
                 S_Cs.append(S_C)
                 # currently we get tensor([7]) and tensor([22]) so we create a tensor out of the start and end indices, this is wrong we have to use outputs[0] because this grants
-                #
-                print("sp_cb shape", sp_cb.shape[0], "sp_ce shape",sp_ce.shape[0], "\n")
-                print("sp_cb type ", sp_cb.type, "sp_ce type ", sp_ce.type, "\n")
-                print("sp_cb zero elem", sp_cb[0], "sp_ce zero elem", sp_ce[0], "\n")
+
+                #print("sp_cb shape", sp_cb.shape[0], "sp_ce shape",sp_ce.shape[0], "\n")
+                #print("sp_cb type ", sp_cb.type, "sp_ce type ", sp_ce.type, "\n")
+                #print("sp_cb zero elem", sp_cb[0], "sp_ce zero elem", sp_ce[0], "\n")
 
                 # Condensed Vector Representation
                 r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()
