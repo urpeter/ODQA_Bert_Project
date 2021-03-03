@@ -44,11 +44,12 @@ class Candid_rep():
         encoded_candidates = []
         start_indices = self.spans[0]
         end_indices = self.spans[1]
-        print("Start ind:", start_indices, "\n End ind:", end_indices, "\n")
-        print("Sequence_Output", self.S_p, "Shape ",self.S_p.shape, "\n")
-        print("Sequence_Output_len", len(self.S_p), "Shape ", self.S_p.shape[0], "\n")
+        #print("Start ind:", start_indices, "\n End ind:", end_indices, "\n")
+        #print("Sequence_Output", self.S_p, "Shape ",self.S_p.shape, "\n")
+        #print("Sequence_Output_len", len(self.S_p), "Shape ", self.S_p.shape[0], "\n")
 
         for p in range(self.S_p[0].shape[0]):
+            print("P", p)
             # Iterate through the candidates per passage
             for i in range(self.k):
                 # Start and end tokens of candidate
