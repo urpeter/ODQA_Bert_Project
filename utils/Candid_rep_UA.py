@@ -49,7 +49,7 @@ class Candid_rep():
         #print("Sequence_Output_len", len(self.S_p), "Shape ", self.S_p.shape[0], "\n")
 
         for p in range(self.S_p[0].shape[0]):
-            print("P", p)
+            print("P", self.S_p[p])
             # Iterate through the candidates per passage
             for i in range(self.k):
                 # Start and end tokens of candidate
