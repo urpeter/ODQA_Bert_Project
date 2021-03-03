@@ -55,7 +55,8 @@ class Candid_rep():
             # Start and end tokens of candidate
             sp_cb = self.S_p[p][start_indices[p]]  # Candidate Nr. i start
             print(start_indices)
-            print("sp_cb", self.S_p[p][start_indices[p]].shape)
+            print("sp_cb", self.S_p[p][-1])
+            print("sp_cb", self.S_p[p][-2])
             sp_ce = self.S_p[p][end_indices[p]]  # Candidate Nr. i end
             #print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
             '''
