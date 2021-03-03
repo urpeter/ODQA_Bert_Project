@@ -81,6 +81,7 @@ class Candid_rep():
         S_Cs = torch.stack(S_Cs, dim=0)
         r_Cs = torch.stack(r_Cs, dim=0)
         encoded_candidates = torch.stack(encoded_candidates, dim=0)
+
         return S_Cs, r_Cs, encoded_candidates
 
     def calculate_correlations(self):
