@@ -63,10 +63,9 @@ class Candid_rep():
             Example p=[a,b,c,d], c=[b,c] => S_C=[0,b,c,0]
             '''
 
-            c = (self.S_p[p][start_indices[p]:end_indices[p]])
+            c = (self.S_p[p][start_indices[p]:end_indices[p]]) #position of the answer with shape[...,768]
             c_len = c.shape[0]
-            print("csjape",c.shape)
-            break
+
             num_start_pads = start_indices[p]
             num_end_pads = 256 - num_start_pads - c_len
             S_C = F.pad(input=c, pad=(0, 0, num_start_pads, num_end_pads), mode='constant', value=0)
