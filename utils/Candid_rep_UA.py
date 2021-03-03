@@ -54,8 +54,7 @@ class Candid_rep():
 
             # Start and end tokens of candidate
             sp_cb = self.S_p[p][start_indices[p]]  # Candidate Nr. i start
-            print("sp_cb", self.S_p[p][start_indices[p]].shape)
-            break
+            #print("sp_cb", self.S_p[p][start_indices[p]].shape)
             sp_ce = self.S_p[p][end_indices[p]]  # Candidate Nr. i end
             #print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
             '''
@@ -63,8 +62,10 @@ class Candid_rep():
             Pad candidate to full length, but keep position relative to full passage
             Example p=[a,b,c,d], c=[b,c] => S_C=[0,b,c,0]
             '''
+
             c = (self.S_p[p][start_indices[p]:end_indices[p]])
             c_len = c.shape[0]
+            print("clen",c_len)
             num_start_pads = start_indices[p]
             num_end_pads = 256 - num_start_pads - c_len
             S_C = F.pad(input=c, pad=(0, 0, num_start_pads, num_end_pads), mode='constant', value=0)
