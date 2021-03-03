@@ -70,12 +70,12 @@ class ODQAModel(BertForQuestionAnswering):
         )
 
         sequence_output = outputs[0]
-        print("\n", "outputs[0]", outputs[0].shape, "\n")
+
         logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1)
         end_logits = end_logits.squeeze(-1)
-
+        print("\n len logits", len(logits), "\n")
         # <- Answer Selection Part
 
         total_loss = None
@@ -97,8 +97,8 @@ class ODQAModel(BertForQuestionAnswering):
         #print("first line", start_logits[1])
         #print("start_logits",list(enumerate(start_logits)), len(list(enumerate(start_logits))))
 
-        start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=256)
-        end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=256)
+        start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=41)
+        end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=41)
         candidate_spans = (start_indexes,end_indexes)
         feat = self.features
 

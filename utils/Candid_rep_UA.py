@@ -49,13 +49,13 @@ class Candid_rep():
         #print("Sequence_Output_len", len(self.S_p), "Shape ", self.S_p.shape[0], "\n")
 
         for p in range(self.S_p[0].shape[0]):
-            print("P", self.S_p[p].shape)
+            #print("P", self.S_p[p].shape)
             # Iterate through the candidates per passage
 
             # Start and end tokens of candidate
             sp_cb = self.S_p[p][start_indices[p]]  # Candidate Nr. i start
             sp_ce = self.S_p[p][end_indices[p]]  # Candidate Nr. i end
-            print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
+            #print("Sp_Cb:", sp_cb, "\n Sp_Ce:", sp_ce, "\n")
             '''
             Full dimensional candidate
             Pad candidate to full length, but keep position relative to full passage
@@ -77,7 +77,7 @@ class Candid_rep():
             r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()
             r_Cs.append(r_C)
             # Candidate in encoded form (embedding indices)
-            enc_c = self.S_p[p][start_indices[p][i]:end_indices[p][i] + 1]
+            enc_c = self.S_p[p][start_indices[p]:end_indices[p] + 1]
             pad_enc_c = F.pad(input=enc_c, pad=(0, 256 - c_len), mode='constant', value=0)
             encoded_candidates.append(pad_enc_c)
 
