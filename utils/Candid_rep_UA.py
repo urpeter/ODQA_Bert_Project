@@ -18,7 +18,7 @@ class Candid_rep():
         # self.hidden_states = None
 
     # TODO adapt this to the model
-    def calculate_candidate_representations(self, spans, features, hidden):
+    def calculate_candidate_representations(self, spans, features, seq_outpu):
         '''
         Given the candidate spans and the passages, extracts the candidates,
         calculates the condensed vector representation r_c, forms a
@@ -26,7 +26,7 @@ class Candid_rep():
         a fused representation tilda_r_Cs to represent how each candidate is
         affected by each other candidate.
         '''
-        self.S_p = hidden
+        self.S_p = seq_outpu
         self.spans = spans
         self.features = features
         self.M = np.asarray(spans[0]).shape[0] * self.k  # num_passages * num_candidates
@@ -44,7 +44,9 @@ class Candid_rep():
         encoded_candidates = []
         start_indices = self.spans[0]
         end_indices = self.spans[1]
-        print("Start ind:", start_indices, "\n End ind:", end_indices,"\n")
+        print("Start ind:", start_indices, "\n End ind:", end_indices, "\n")
+        print("Sequence_Output", self.S_p, "Shape ",self.S_p.shape, "\n")
+        print("Sequence_Output_len", len(self.S_p), "Shape ", self.S_p.shape[0], "\n")
 
         for p in range(self.S_p[0].shape[0]):
             # Iterate through the candidates per passage
@@ -64,7 +66,8 @@ class Candid_rep():
                 num_end_pads = 256 - num_start_pads - c_len
                 S_C = F.pad(input=c, pad=(0, 0, num_start_pads, num_end_pads), mode='constant', value=0)
                 S_Cs.append(S_C)
-                # currently we get tensor([7]) and tensor([22]) so we create a tensor out of the start and end indices, this is wrong
+                # currently we get tensor([7]) and tensor([22]) so we create a tensor out of the start and end indices, this is wrong we have to use outputs[0] because this grants
+                #
                 print("sp_cb shape", sp_cb.shape[0], "sp_ce shape",sp_ce.shape[0], "\n")
                 print("sp_cb type ", sp_cb.type, "sp_ce type ", sp_ce.type, "\n")
                 print("sp_cb zero elem", sp_cb[0], "sp_ce zero elem", sp_ce[0], "\n")

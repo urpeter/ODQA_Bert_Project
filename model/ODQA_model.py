@@ -66,17 +66,11 @@ class ODQAModel(BertForQuestionAnswering):
             attention_mask=attention_mask,
             token_type_ids=token_type_ids,
             position_ids=position_ids,
-            output_hidden_states=output_hidden_states,
             return_dict=return_dict,
         )
 
         sequence_output = outputs[0]
         print("\n", "outputs[0]", outputs[0].shape, "\n")
-        print("\n", "outputs[1]", outputs[1].shape, "\n")
-        print("Length of Outputs[2]",len(outputs[2]), "\n")
-        print("Hidden states type 1. elem:", type(outputs[2][0]), "\n")
-        print("Hidden states first elem:", outputs[2][0].shape, "\n")
-        # print("Hidden states first elem, 3rd elem", outputs[2][0][3].shape, "\n")
         logits = self.qa_outputs(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1)
@@ -111,7 +105,7 @@ class ODQAModel(BertForQuestionAnswering):
         # spans in the original is structured like [passages, number of candidates, span of the answer]
         self.candidate_representation.calculate_candidate_representations(spans=candidate_spans,
                                                                           features=feat,
-                                                                          hidden=outputs[2])
+                                                                          seq_outpu=sequence_output)
 
         r_Cs = self.candidate_representation.r_Cs  # [200, 100]
         r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
