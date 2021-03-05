@@ -133,5 +133,5 @@ class Candid_rep():
             print("tilda_rcm", tilda_rcm.shape)
             tilda_rcms.append(tilda_rcm)
 
-        return torch.stack(tilda_rcms, dim=0)  # (200x100)
+        return torch.stack(tilda_rcms, dim=0)  # (x100)
 
