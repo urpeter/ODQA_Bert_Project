@@ -75,7 +75,8 @@ class Candid_rep():
             # Candidate in encoded form (embedding indices)
             enc_c = self.S_p[p][start_indices[p]:end_indices[p] + 1]
             pad_enc_c = F.pad(input=enc_c, pad=(0, 256 - c_len), mode='constant', value=0)
-            encoded_candidates.append(pad_enc_c)
+            print("pad_enc ", pad_enc_c, "enc_c ", enc_c, "\n")
+            encoded_candidates.append(enc_c)
 
         # Stack to turn into tensor
         S_Cs = torch.stack(S_Cs, dim=0)
