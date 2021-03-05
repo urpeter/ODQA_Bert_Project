@@ -69,6 +69,8 @@ class Candid_rep():
 
             # Condensed Vector Representation
             r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()
+            print("self.wb(sp_cb)",self.wb(sp_cb).shape, "self.we(sp_ce)", self.we(sp_ce).shape)
+            print("r_C",r_C.shape)
             r_Cs.append(r_C)
             # Candidate in encoded form (embedding indices)
             enc_c = self.S_p[p][start_indices[p]:end_indices[p] + 1]
@@ -122,12 +124,16 @@ class Candid_rep():
             alpha_m = torch.div(numerator, denominator)  # 199x1
             alpha_ms.append(alpha_m)
         alpha = torch.stack(alpha_ms, dim=0)  # (200,199)
+        print("alpha", alpha.shape)
         tilda_rcms = []
         for i, r_C in enumerate(self.r_Cs):
             rcm = torch.cat([self.r_Cs[0:i], self.r_Cs[i + 1:]], dim=0)
+            print("rcm", rcm.shape)
             alpha_m = torch.cat([alpha[0:i], alpha[i + 1:]], dim=0)  # (199x199)
+            print("alpha_m", alpha_m.shape)
             tilda_rcm = torch.sum(torch.mm(alpha_m, rcm), dim=0)  # (1x100)
+            print("tilda_rcm", tilda_rcm.shape)
             tilda_rcms.append(tilda_rcm)
-
+            break
         return torch.stack(tilda_rcms, dim=0)  # (200x1x100)
 
