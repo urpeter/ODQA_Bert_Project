@@ -117,12 +117,12 @@ class Candid_rep():
         # Normalize interactions
 
         alpha_ms = []
-        for i, V_jm in enumerate(self.V):
+        for i, V_jm in enumerate(self.V): # V shape (41x40)
             numerator = torch.exp(V_jm)
-            denominator_correlations = torch.cat([self.V[0:i], self.V[i + 1:]], dim=0)  # (200x199)
+            denominator_correlations = torch.cat([self.V[0:i], self.V[i + 1:]], dim=0)  # (40x40)
             print("denominator", denominator_correlations.shape)
             denominator = torch.sum(torch.exp(denominator_correlations), dim=0)
-            alpha_m = torch.div(numerator, denominator)  # 199x1
+            alpha_m = torch.div(numerator, denominator)  # 40x1
             print("alpha_m", alpha_m.shape)
             alpha_ms.append(alpha_m)
         alpha = torch.stack(alpha_ms, dim=0)  # (41,40)
