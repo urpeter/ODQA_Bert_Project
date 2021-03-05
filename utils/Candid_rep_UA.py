@@ -83,7 +83,7 @@ class Candid_rep():
         S_Cs = torch.stack(S_Cs, dim=0)
         r_Cs = torch.stack(r_Cs, dim=0)  # tensor shape[41,256]
         self.r_Cs = r_Cs
-        self.V = self.calculate_correlations()  # set the correlation matrix to tensor[41,40]
+        self.V = self.calculate_correlations()  # correlation matrix [41,40]
         print("calc_corr successful: ", "shape of r_CS", r_Cs.shape)
         print("V_shape", self.V.shape)
         tilde_r_C = self.generate_fused_representation()
@@ -123,14 +123,14 @@ class Candid_rep():
             print("denominator", denominator_correlations.shape)
             denominator = torch.sum(torch.exp(denominator_correlations), dim=0)
             alpha_m = torch.div(numerator, denominator)  # 199x1
+            print("alpha_m", alpha_m.shape)
             alpha_ms.append(alpha_m)
-        alpha = torch.stack(alpha_ms, dim=0)  # (200,199)
-        print("alpha", alpha.shape)
+        alpha = torch.stack(alpha_ms, dim=0)  # (41,40)
         tilda_rcms = []
+
         for i, r_C in enumerate(self.r_Cs):
             rcm = torch.cat([self.r_Cs[0:i], self.r_Cs[i + 1:]], dim=0)
-            alpha_m = torch.cat([alpha[0:i], alpha[i + 1:]], dim=0)  # (199x199)
-            print("alpha_m",alpha_m.shape)
+            alpha_m = torch.cat([alpha[0:i], alpha[i + 1:]], dim=0)  # (40x40)
             tilda_rcm = torch.sum(torch.mm(alpha_m, rcm), dim=0)  # (1x256)
             tilda_rcms.append(tilda_rcm)
 
