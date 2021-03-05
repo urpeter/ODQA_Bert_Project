@@ -30,7 +30,7 @@ class Candid_rep():
         self.features = features
         self.M = np.asarray(spans[0]).shape[0] * self.k  # num_passages * num_candidates
         self.S_Cs, self.r_Cs, self.encoded_candidates = self.calculate_condensed_vector_representation()
-        self.V = self.calculate_correlations()
+        # self.V = self.calculate_correlations()
         self.tilda_r_Cs = self.generate_fused_representation()
 
     def calculate_condensed_vector_representation(self):
@@ -80,9 +80,12 @@ class Candid_rep():
         S_Cs = torch.stack(S_Cs, dim=0)
         r_Cs = torch.stack(r_Cs, dim=0)  # tensor shape[41,256]
         self.r_Cs = r_Cs
-        V = self.calculate_correlations()  # set the correlation matrix to tensor[41,40]
+        self.V = self.calculate_correlations()  # set the correlation matrix to tensor[41,40]
         print("calc_corr successful: ", "shape of r_CS", r_Cs.shape)
-        print("V_shape", V.shape)
+        print("V_shape", self.V.shape)
+        tilde_r_C = self.generate_fused_representation()
+        print("tilde_rcs Successful")
+        print("tilde_rcs shape", tilde_r_C.shape)
         encoded_candidates = torch.stack(encoded_candidates, dim=0)
 
         return S_Cs, r_Cs, encoded_candidates
