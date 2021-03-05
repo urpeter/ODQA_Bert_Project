@@ -17,7 +17,6 @@ class Candid_rep():
         self.wv = nn.Linear(256, 1, bias=False)
 
 
-    # TODO adapt this to the model
     def calculate_candidate_representations(self, spans, features, seq_outpu):
         '''
         Given the candidate spans and the passages, extracts the candidates,
@@ -44,7 +43,7 @@ class Candid_rep():
         encoded_candidates = []
         start_indices = self.spans[0]
         end_indices = self.spans[1]
-        print("Start ind:", start_indices, "\n End ind:", end_indices, "\n")
+        #print("Start ind:", start_indices, "\n End ind:", end_indices, "\n")
         #print("Sequence_Output", self.S_p, "Shape ",self.S_p.shape, "\n")
         #print("Sequence_Output_len", len(self.S_p), "Shape ", self.S_p.shape[0], "\n")
         #print("S_P.shape", self.S_p.shape[0])
@@ -60,7 +59,6 @@ class Candid_rep():
             Pad candidate to full length, but keep position relative to full passage
             Example p=[a,b,c,d], c=[b,c] => S_C=[0,b,c,0]
             '''
-
             c = (self.S_p[p][start_indices[p]:end_indices[p]]) #position of the answer with shape[...,768]
             c_len = c.shape[0]
 
@@ -75,12 +73,14 @@ class Candid_rep():
             # Candidate in encoded form (embedding indices)
             enc_c = self.S_p[p][start_indices[p]:end_indices[p] + 1]
             pad_enc_c = F.pad(input=enc_c, pad=(0, 256 - c_len), mode='constant', value=0)
-            print("pad_enc ", pad_enc_c, "enc_c ", enc_c, "\n")
+            print("enc_c ", enc_c, "\n")
             encoded_candidates.append(enc_c)
 
         # Stack to turn into tensor
         S_Cs = torch.stack(S_Cs, dim=0)
         r_Cs = torch.stack(r_Cs, dim=0)
+        self.r_Cs = r_Cs
+        self.calculate_correlations()
         encoded_candidates = torch.stack(encoded_candidates, dim=0)
 
         return S_Cs, r_Cs, encoded_candidates

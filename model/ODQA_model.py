@@ -94,8 +94,6 @@ class ODQAModel(BertForQuestionAnswering):
             start_loss = loss_fct(start_logits, start_positions)
             end_loss = loss_fct(end_logits, end_positions)
             total_loss = (start_loss + end_loss) / 2
-        #print("first line", start_logits[1])
-        #print("start_logits",list(enumerate(start_logits)), len(list(enumerate(start_logits))))
 
         start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=41)
         end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=41)
@@ -106,29 +104,9 @@ class ODQAModel(BertForQuestionAnswering):
         self.candidate_representation.calculate_candidate_representations(spans=candidate_spans,
                                                                           features=feat,
                                                                           seq_outpu=sequence_output)
-
         r_Cs = self.candidate_representation.r_Cs  # [200, 100]
         r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
         encoded_candidates = self.candidate_representation.encoded_candidates
-
-        #predictions_dict, ODQA_predictions_list = postprocess_qa_predictions(examples=self.examples,
-         #                                             features=self.features,
-          #                                            predictions=(start_logits, end_logits),
-           #                                           version_2_with_negative=True,
-            #                                          n_best_size=1
-             #                                         )
-
-        #candidate_spans = predictions_dict[self.examples.qas_id]["start_index"] + \
-         #                 predictions_dict[self.examples.qas_id]["end_index"]
-
-
-        #candidate_spans_list = [x['candidate_span'] for x in ODQA_predictions_list]
-        #start_indices = [x['start_index'] for x in ODQA_predictions_list]
-        #end_indices = [x['end_index'] for x in ODQA_predictions_list]
-        #texts = [x['text'] for x in ODQA_predictions_list]
-        #print("candidate_spans_list",candidate_spans_list,"\n")
-        #candidate_spans = torch.stack(candidate_spans_list, dim=0)
-        #print("candidate_spans",candidate_spans,"\n")
 
         if not return_dict:
             output = (start_logits, end_logits) + outputs[2:]
