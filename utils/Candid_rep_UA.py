@@ -120,18 +120,19 @@ class Candid_rep():
         for i, V_jm in enumerate(self.V):
             numerator = torch.exp(V_jm)
             denominator_correlations = torch.cat([self.V[0:i], self.V[i + 1:]], dim=0)  # (200x199)
-
+            print("denominator", denominator_correlations.shape)
             denominator = torch.sum(torch.exp(denominator_correlations), dim=0)
             alpha_m = torch.div(numerator, denominator)  # 199x1
             alpha_ms.append(alpha_m)
         alpha = torch.stack(alpha_ms, dim=0)  # (200,199)
+        print("alpha", alpha.shape)
         tilda_rcms = []
         for i, r_C in enumerate(self.r_Cs):
             rcm = torch.cat([self.r_Cs[0:i], self.r_Cs[i + 1:]], dim=0)
             alpha_m = torch.cat([alpha[0:i], alpha[i + 1:]], dim=0)  # (199x199)
-            tilda_rcm = torch.sum(torch.mm(alpha_m, rcm), dim=0)  # (1x100)
-            print("tilda_rcm", tilda_rcm.shape)
+            print("alpha_m",alpha_m.shape)
+            tilda_rcm = torch.sum(torch.mm(alpha_m, rcm), dim=0)  # (1x256)
             tilda_rcms.append(tilda_rcm)
 
-        return torch.stack(tilda_rcms, dim=0)  # (x100)
+        return torch.stack(tilda_rcms, dim=0)  # (41x256)
 
