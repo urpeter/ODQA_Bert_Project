@@ -92,7 +92,7 @@ class ODQAModel(BertForQuestionAnswering):
         # print("p_C",p_C,"\n")
         value, index = torch.max(p_C, 1)
 
-        answer = sequence_output[index]
+        answer = sequence_output[index[-1]]
 
         # encoded_candidates = self.candidate_representation.encoded_candidates
         logits = self.qa_outputs(answer)
