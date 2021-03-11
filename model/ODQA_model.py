@@ -90,7 +90,7 @@ class ODQAModel(BertForQuestionAnswering):
         r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
         p_C = self.score_answers(r_Ctilde)
         # print("p_C",p_C,"\n")
-        value, index = torch.max(p_C, 0)
+        value, index = torch.max(p_C, 1)
 
         answer = sequence_output[index]
 
