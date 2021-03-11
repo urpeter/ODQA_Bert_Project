@@ -27,8 +27,8 @@ class ODQAModel(BertForQuestionAnswering):
         self.qa_outputs = nn.Linear(config.hidden_size, config.num_labels)
         self.examples = None
         self.features = None
-
         self.init_weights()
+        self.wz = nn.Linear(256, 1, bias=False)
     @add_start_docstrings_to_callable(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
     @add_code_sample_docstrings(
         tokenizer_class=_TOKENIZER_FOR_DOC,
@@ -106,8 +106,12 @@ class ODQAModel(BertForQuestionAnswering):
                                                                           seq_outpu=sequence_output)
         r_Cs = self.candidate_representation.r_Cs  # [200, 100]
         r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
-        encoded_candidates = self.candidate_representation.encoded_candidates
-
+        p_C = self.score_answers(r_Ctilde)
+        print("p_C",p_C,"\n")
+        value, index = torch.max(p_C, 0)
+        print("Value",value,"Index",index)
+        #encoded_candidates = self.candidate_representation.encoded_candidates
+        # take maximum candidate whatever is highest
         if not return_dict:
             output = (start_logits, end_logits) + outputs[2:]
             return ((total_loss,) + output) if total_loss is not None else output
@@ -123,5 +127,16 @@ class ODQAModel(BertForQuestionAnswering):
     def get_examples_and_features(self, examples, features):
         self.features = features
         self.examples = examples
+
+    def score_answers(self, z_C, pretraining = False):
+        s = []
+        for c in z_C:
+            s.append(self.wz(c)) # wz:(200,100) for us this should be [256]
+        s = torch.stack(s, dim=0)
+        print("ping")
+        if pretraining == True:
+            return s.squeeze().unsqueeze(dim=0)
+        else:
+            return torch.softmax(s, dim=0) #p_C
 
 

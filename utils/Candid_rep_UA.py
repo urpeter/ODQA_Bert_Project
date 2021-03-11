@@ -17,6 +17,8 @@ class Candid_rep():
         self.wv = nn.Linear(256, 1, bias=False)
 
 
+
+
     def calculate_candidate_representations(self, spans, features, seq_outpu):
         '''
         Given the candidate spans and the passages, extracts the candidates,
@@ -69,9 +71,9 @@ class Candid_rep():
 
             # Condensed Vector Representation
             r_C = torch.add(self.wb(sp_cb), self.we(sp_ce)).tanh()
-            print("shape sp_cb",sp_cb.shape,"shape sp_ce",sp_ce.shape)
-            print("self.wb(sp_cb)",self.wb(sp_cb).shape, "self.we(sp_ce)", self.we(sp_ce).shape)
-            print("r_C",r_C.shape)
+            #print("shape sp_cb",sp_cb.shape,"shape sp_ce",sp_ce.shape)
+            #print("self.wb(sp_cb)",self.wb(sp_cb).shape, "self.we(sp_ce)", self.we(sp_ce).shape)
+            #print("r_C",r_C.shape)
             r_Cs.append(r_C)
             # Candidate in encoded form (embedding indices)
             enc_c = self.S_p[p][start_indices[p]:end_indices[p] + 1]
@@ -84,12 +86,13 @@ class Candid_rep():
         r_Cs = torch.stack(r_Cs, dim=0)  # tensor shape[41,256]
         self.r_Cs = r_Cs
         self.V = self.calculate_correlations()  # correlation matrix [41,40]
-        print("calc_corr successful: ", "shape of r_CS", r_Cs.shape)
-        print("V_shape", self.V.shape)
-        tilde_r_C = self.generate_fused_representation()
-        print("tilde_rcs Successful")
-        print("tilde_rcs shape", tilde_r_C.shape)
-        encoded_candidates = torch.stack(encoded_candidates, dim=0)
+        #print("calc_corr successful: ", "shape of r_CS", r_Cs.shape)
+        #print("V_shape", self.V.shape)
+        #self.tilde_r_C = self.generate_fused_representation()
+        #print("tilde_rcs Successful")
+        #print("tilde_rcs shape", tilde_r_C.shape)
+
+        #encoded_candidates = torch.stack(encoded_candidates, dim=0)
 
         return S_Cs, r_Cs, encoded_candidates
 
