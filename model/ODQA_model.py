@@ -109,7 +109,7 @@ class ODQAModel(BertForQuestionAnswering):
         p_C = self.score_answers(r_Ctilde)
         #print("p_C",p_C,"\n")
         value, index = torch.max(p_C, 0)
-        print("Value",value,"Index",index.view(index.shape[0]))
+        print("Value",value,"Index",index.view(index.shape[0],index.shape[1]))
         #encoded_candidates = self.candidate_representation.encoded_candidates
         # take maximum candidate whatever is highest
         if not return_dict:
