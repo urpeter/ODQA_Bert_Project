@@ -93,17 +93,18 @@ class ODQAModel(BertForQuestionAnswering):
         value, index = torch.max(p_C, 0)
 
         answer = sequence_output[index]
-        print("Answer shape", answer.shape)
+
         # encoded_candidates = self.candidate_representation.encoded_candidates
         logits = self.qa_outputs(answer)
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1)
         end_logits = end_logits.squeeze(-1)
-        print("Logits", logits, "end_log", end_logits)
+        #print("Logits", logits, "end_log", end_logits)
 
         # <- Answer Selection Part
         start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=1)
         end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=1)
+        print("start",start_indexes,"end",end_indexes)
 
         total_loss = None
         if start_positions is not None and end_positions is not None:
