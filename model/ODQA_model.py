@@ -89,17 +89,17 @@ class ODQAModel(BertForQuestionAnswering):
         r_Cs = self.candidate_representation.r_Cs  # [200, 100]
         r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
         p_C = self.score_answers(r_Ctilde)
-        # print("p_C",p_C,"\n")
+        print("p_C",p_C,"\n")
         value, index = torch.max(p_C, 1)
 
-        answer = sequence_output[index[-1]]
+        answer = sequence_output[index]
 
         # encoded_candidates = self.candidate_representation.encoded_candidates
-        logits = self.qa_outputs(answer)
+        logits = self.qa_outputs(p_C)
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1)
         end_logits = end_logits.squeeze(-1)
-        #print("Logits", logits, "end_log", end_logits)
+        print("Logits", logits, "end_log", end_logits)
 
         # <- Answer Selection Part
         start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=1)
