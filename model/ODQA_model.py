@@ -75,7 +75,7 @@ class ODQAModel(BertForQuestionAnswering):
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1)
         end_logits = end_logits.squeeze(-1)
-        print("\n len logits", len(logits), "\n")
+
         # <- Answer Selection Part
 
         total_loss = None
@@ -107,9 +107,11 @@ class ODQAModel(BertForQuestionAnswering):
         r_Cs = self.candidate_representation.r_Cs  # [200, 100]
         r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
         p_C = self.score_answers(r_Ctilde)
-        print("p_C",p_C,"\n")
+        #print("p_C",p_C,"\n")
         value, index = torch.max(p_C, 0)
-        print("Value",value,"Index",index.shape)
+        print("Value",value,"Index",index)
+        answer = sequence_output[index]
+        print("Answer shape", answer.shape)
         #encoded_candidates = self.candidate_representation.encoded_candidates
         # take maximum candidate whatever is highest
         if not return_dict:
