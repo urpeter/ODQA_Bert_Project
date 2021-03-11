@@ -77,6 +77,33 @@ class ODQAModel(BertForQuestionAnswering):
         end_logits = end_logits.squeeze(-1)
 
         # <- Answer Selection Part
+        start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=41)
+        end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=41)
+        candidate_spans = (start_indexes, end_indexes)
+        feat = self.features
+
+        # spans in the original is structured like [passages, number of candidates, span of the answer]
+        self.candidate_representation.calculate_candidate_representations(spans=candidate_spans,
+                                                                          features=feat,
+                                                                          seq_outpu=sequence_output)
+        r_Cs = self.candidate_representation.r_Cs  # [200, 100]
+        r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
+        p_C = self.score_answers(r_Ctilde)
+        # print("p_C",p_C,"\n")
+        value, index = torch.max(p_C, 0)
+
+        answer = sequence_output[index]
+        print("Answer shape", answer.shape)
+        # encoded_candidates = self.candidate_representation.encoded_candidates
+        logits = self.qa_outputs(answer)
+        start_logits, end_logits = logits.split(1, dim=-1)
+        start_logits = start_logits.squeeze(-1)
+        end_logits = end_logits.squeeze(-1)
+        print("Logits", logits, "end_log", end_logits)
+
+        # <- Answer Selection Part
+        start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=1)
+        end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=1)
 
         total_loss = None
         if start_positions is not None and end_positions is not None:
@@ -95,25 +122,6 @@ class ODQAModel(BertForQuestionAnswering):
             end_loss = loss_fct(end_logits, end_positions)
             total_loss = (start_loss + end_loss) / 2
 
-        start_indexes = squad_metrics._get_best_indexes(start_logits.tolist(), n_best_size=41)
-        end_indexes = squad_metrics._get_best_indexes(end_logits.tolist(), n_best_size=41)
-        candidate_spans = (start_indexes,end_indexes)
-        feat = self.features
-
-        # spans in the original is structured like [passages, number of candidates, span of the answer]
-        self.candidate_representation.calculate_candidate_representations(spans=candidate_spans,
-                                                                          features=feat,
-                                                                          seq_outpu=sequence_output)
-        r_Cs = self.candidate_representation.r_Cs  # [200, 100]
-        r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
-        p_C = self.score_answers(r_Ctilde)
-        #print("p_C",p_C,"\n")
-        value, index = torch.max(p_C, 0)
-        print("Value",value,"Index",index)
-        answer = sequence_output[index]
-        print("Answer shape", answer.shape)
-        #encoded_candidates = self.candidate_representation.encoded_candidates
-        # take maximum candidate whatever is highest
         if not return_dict:
             output = (start_logits, end_logits) + outputs[2:]
             return ((total_loss,) + output) if total_loss is not None else output
