@@ -107,7 +107,7 @@ class ODQAModel(BertForQuestionAnswering):
         r_Cs = self.candidate_representation.r_Cs  # [200, 100]
         r_Ctilde = self.candidate_representation.tilda_r_Cs  # [200, 100]
         p_C = self.score_answers(r_Ctilde)
-        #print("p_C",p_C,"\n")
+        print("p_C",p_C,"\n")
         value, index = torch.max(p_C, 0)
         print("Value",value,"Index",index.shape)
         #encoded_candidates = self.candidate_representation.encoded_candidates
@@ -131,6 +131,7 @@ class ODQAModel(BertForQuestionAnswering):
     def score_answers(self, z_C, pretraining = False):
         s = []
         for c in z_C:
+            print("candidate", c)
             s.append(self.wz(c)) # wz:(200,100) for us this should be [256]
         s = torch.stack(s, dim=0)
         print("ping")
