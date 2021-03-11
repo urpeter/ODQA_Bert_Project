@@ -91,8 +91,8 @@ class ODQAModel(BertForQuestionAnswering):
         p_C = self.score_answers(r_Ctilde)
         print("p_C",p_C,"\n")
         value, index = torch.max(p_C, 0)
-        start_index, end_index = start_indexes[index], end_indexes[index]
         answer = sequence_output[index]
+        print("Answer shape",answer)
 
         logits = self.qa_outputs(answer)
         start_logits, end_logits = logits.split(1, dim=-1)
