@@ -131,7 +131,6 @@ class ODQAModel(BertForQuestionAnswering):
     def score_answers(self, z_C, pretraining = False):
         s = []
         for c in z_C:
-            print("candidate", c)
             s.append(self.wz(c)) # wz:(200,100) for us this should be [256]
         s = torch.stack(s, dim=0)
         print("ping")
